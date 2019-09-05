@@ -9,14 +9,15 @@ if utility_exists == 1
             for i=1:length(endpts) %i counts months 
                 if i==1 % for January
                     Constraints=[Constraints
-                        import(1:endpts(1),k) <= nontou_dc(i,dc_count)];
+                        (import(1:endpts(1),k) <= nontou_dc(i,dc_count)):'nontou_dc (first month)'];
                 else % for all other months 
                     Constraints=[Constraints
-                        import(endpts(i-1)+1:endpts(i),k) <= nontou_dc(i,dc_count)];
+                        (import(endpts(i-1)+1:endpts(i),k) <= nontou_dc(i,dc_count)):'nontou_dc (other months)'];
                 end
             end
                         
-            %% TOU Demand Charges
+            %% TOU Demand Charges (Only during summer months)
+          if ~isempty(summer_month) % if we are simulating a summer month
             for i=1:length(summer_month) % i loops through every SUMMER month
                 %%%Finding start/finish of each summer month
                 if summer_month(i)==1
@@ -42,9 +43,12 @@ if utility_exists == 1
                     import(on_index,k) <= onpeak_dc(i,dc_count)
                     import(mid_index,k) <= midpeak_dc(i,dc_count)];
             end
+          end 
             
             %%%Moving to next DC variable set
             dc_count = dc_count+1;
-        end
+            
+          end
+        
     end
 end

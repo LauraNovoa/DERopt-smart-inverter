@@ -67,6 +67,7 @@ Pinj = value(Pinj); %Pinj(isnan(Pinj)) = 0; %kW
 Qinj = value(Qinj); %Qinj(isnan(Pinj)) = 0; %kVAR
 Sinj = sqrt(Pinj.^2 + Qinj.^2); %Absolute value %kVA 
 %Sinj = Pinj./cos(atan(Qinj./Pinj)); %kVA %Captures the (+) and (-) flows 
+z = value(z);
 
 if opt_t 
     T_rated = value(T_rated);
@@ -83,6 +84,8 @@ Qcap = value(Qcap); %kVAR
 Qelec = value(Qelec); %kVAR
 Qimport = value(Qimport); %kVAR
 %Sinv = Pinv./cos(atan(Qinv./Pinv)); %kVA %Captures the (+) and (-) flows 
+active = value(active);
+active2 = value(active2);
 
 %DLPF
 if dlpfc == 1

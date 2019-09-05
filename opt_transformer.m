@@ -55,6 +55,8 @@ end
 %% Pinj, Qinj, and Polygon Constraints 
 Pinj = sdpvar(T,N,'full'); %kW
 Qinj = sdpvar(T,N,'full'); %kVAR 
+Pinj_in = sdpvar(T,N,'full'); %kW
+Qinj_in = sdpvar(T,N,'full'); %kVAR
 
 %Transformer Polygon Constraints
 L = 20; % number of line segments of the polygon
@@ -70,7 +72,9 @@ for n=1:N % For each node n
       
       Constraints = [Constraints 
           (Pinj(:,n) == sum(import(:,cluster) - pv_nem(:,cluster) - pv_wholesale(:,cluster) - rees_dchrg_nem(:,cluster),2)):'Pinj'
-          (Qinj(:,n) == sum(Qimport(:,cluster) + Qind(:,cluster) - Qcap(:,cluster),2)):'Qinj']; %kVAR 
+          (Pinj_in(:,n) == sum(import(:,cluster),2)):'Pinj_in'
+          (Qinj(:,n) == sum(Qimport(:,cluster) + Qind(:,cluster) - Qcap(:,cluster),2)):'Qinj'
+          (Qinj_in(:,n) == sum(Qimport(:,cluster) + Qind(:,cluster),2)):'Qinj_in']; %kVAR 
       
         if tc ==1 %Add transformer kVA rating polygon constraint 
             Constraints = [Constraints, (C*[Pinj(:,n)';Qinj(:,n)'] <= alpha*s(n)):'Transformer Polygon'];
@@ -83,3 +87,23 @@ for n=1:N % For each node n
         Qinj(:,n) = zeros(T,1);
     end
 end
+
+%% Fixing min power factor at the transformer
+% Just so Qimport is not too large 
+
+if minpf == 1
+    
+    PFmin = 0.9;
+    mm = -T_rated ;
+    MM = T_rated ; 
+
+    z = binvar(size(Qinj,1),size(Qinj,2),'full');
+
+    Constraints = [Constraints, 
+%       (z*repmat(mm,N,1) <= Qinj <= (1-z)*repmat(MM,N,1)):'Min PF 1'
+%       (tan(PFmin)*Pinj + (1-z)*repmat(mm,N,1) <= Qinj <= tan(PFmin)*Pinj + z*repmat(MM,N,1)):'Min PF 2'
+        (z*repmat(mm,N,1) <= Qinj_in <= (1-z)*repmat(MM,N,1)):'Min PF 1'
+        (tan(PFmin)*Pinj_in + (1-z)*repmat(mm,N,1) <= Qinj_in <= tan(PFmin)*Pinj_in + z*repmat(MM,N,1)):'Min PF 2'
+        ];
+    
+end 

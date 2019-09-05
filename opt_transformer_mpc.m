@@ -12,7 +12,13 @@ T = length(time); %t-th time interval from 1...T
 %             k1   k2  k3          K   
 %T_map(k)= [  n1 | n1 | n1 | ... |   ]; 
 %(1,K) 
-T_map = [2	3	4	5	6	7	7	8	9	9	10	10	11	12	12	13	13	14	15	15	16	16	17	17	18	18	19	19	20	20	21	21	22	22	23	23	24	24	25	26	26	27	27	28	28	29	29	30	31	31	32	32	33	33];
+
+%Farhad 54 buildings mapping to IEEE-3 
+%T_map = [2	3	4	5	6	7	7	8	9	9	10	10	11	12	12	13	13	14	15	15	16	16	17	17	18	18	19	19	20	20	21	21	22	22	23	23	24	24	25	26	26	27	27	28	28	29	29	30	31	31	32	32	33	33];
+
+%ldn 11 bldg  mapping to IEEE-3 
+T_map = [21	7	8	5	25	21	9	14	24	17	4];
+
 
 %% Transformer Ratings
 %% Optimize Transformer Ratings
@@ -45,8 +51,12 @@ if opt_t
 %% Known transformer ratings   
 else
     %(1,N) transformer ratings in kVA, node 1 (slack bus) has 0 kVA rating 
-    T_rated = [0 150	100	150	75	75	250	250	75	75	50	75	75	150	75	75	75	100	100	100	100	100	100	500	500	75	75	75	150	250	200	250	75];
-       
+    
+    %Farhad 54-bldg to IEEE-33
+    %T_rated = [0 150	100	150	75	75	250	250	75	75	50	75	75	150	75	75	75	100	100	100	100	100	100	500	500	75	75	75	150	250	200	250	75];
+  
+    %ldn 11-bldg  to IEEE-33
+    T_rated = [0	0	0	600	1250	0	200	400	900	0	0	0	0	700	0	0	2000	0	0	0	1000	0	0	400	700	0	0	0	0	1250	0	0	0];  
 end 
 
 %% Pinj, Qinj, and Polygon Constraints 

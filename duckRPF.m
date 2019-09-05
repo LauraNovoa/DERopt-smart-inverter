@@ -1,8 +1,8 @@
 %Reverse Power Flow
-AECelec = sum(elec,2);
+Totalelec = sum(elec,2);
 Solar = 4000*solar;
 
-duck  = AECelec - Solar;
+duck  = Totalelec - Solar;
 
 %Soted duck courve -> First entry is the worst RPF 
 [sortduck,idx]= sort(duck);

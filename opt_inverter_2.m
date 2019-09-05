@@ -1,4 +1,6 @@
 % Inverter Constraints *with SI functions 
+% Allows Pinv curtail at the AC level (<= sign)
+%-> No Qelec 
 
 %% Optimize inverter size
 inv_adopt = sdpvar(1,K,'full'); %Optimize inverter size
@@ -11,7 +13,7 @@ Qinv = sdpvar(T,K,'full'); %kVAR
 Qcap = sdpvar(T,K,'full'); %kVAR
 Qind = sdpvar(T,K,'full'); %kVAR
 
-Objective = Objective + sum(sum(Qimport)); % Adding this with the hopes of reducing Qimport and meeting Qbldg qith Qelec
+Objective = Objective + sum(sum(Qimport)); % Adding this with the hopes of reducing Qimport
 
 Constraints = [Constraints, 
     (Pinv <= ees_chrg - pv_elec - pv_nem - pv_wholesale - ees_dchrg - rees_dchrg - rees_dchrg_nem):'Pinv'
@@ -19,7 +21,7 @@ Constraints = [Constraints,
     (Qinv == Qind - Qcap ):'Qinv' % No more Qelec 
     ];
 
-% Moved to opt_smart_inverter
+% Moved to opt_smart_inverter.m
 %% Volt-Var curve
 % VV_V1 = 0.9;
 % VV_V2 = 0.97;

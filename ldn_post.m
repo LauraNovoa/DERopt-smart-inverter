@@ -53,7 +53,6 @@ Import_Export = table(total_import, total_export, NetEnergy, PVCurtail, total_ex
 BatteryTotals = table(totalEES_chrg_kWh,totalEES_dchrg_kWh, 'VariableNames' , {'Total_EES_Charge_kWh','Total_EES_Discharge_kWh' })
 %AECtotals = table(peakload,totalAECkWh,NetEnergy, 'VariableNames', {'Peak_Load_kW','AEC_Energy_Consumption_kWh','AEC_Net_Energy_kWh'})
 
-
 %% Bulding ZNE (to calculate bar graph)
 ZNE_blgd = sum(import) - sum(pv_nem) - sum(pv_wholesale) - sum(rees_dchrg_nem);
 
@@ -229,7 +228,11 @@ resc{i,1} = varnames{i};
 end
 
 resc
- 
+
+%% Check PV Curtailment
+
+%max(pv_curtail(:,10:19)) %check if residential is curtailing
+
 %% Errors 
 % % Values < 1e-5 MW (1 W) are substituted by 1e-5 (1 W) to avoid high % errors 
 % smalls = find(abs(BranchPFlowAC)<=1E-5); BranchPFlowAC(smalls) = 1E-5;

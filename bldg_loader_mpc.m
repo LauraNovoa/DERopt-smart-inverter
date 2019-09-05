@@ -1,12 +1,6 @@
-
-%%Days to be selected from building load
-% summer_days=[22 8];
-% summer_weekend_start=5;
-% winter_days=[43 18];
-% winter_weekend_start=3;
   
 %% IEEE-33 node test case
-%%% 11 representative loads
+%%% 11 representative BLDG loads
 
 %Read all excel files in the "FilteredCleanData" folder
 D = dir(['U:\Github\DERopt_inverter\FilteredCleanData', '\*.xlsx']);
@@ -41,40 +35,24 @@ t_step=round((time(2) - time(1))*(60*24));
 %load 'solar_m2.mat'
 load 'solar_sna.mat'
 
+%% Only simulating week with worst RPF 
+
+duckRPF;
+
+elec = elec(idxweekRPF,:);
+time = time(idxweekRPF);
+datetimev = datetimev(idxweekRPF,:)
+solar = solar(idxweekRPF);
+day_multi = ones(length(elec),1);
+
 %% K-medoids 
-
-kmedoids_demand_mpc
-kmedoids_solar_mpc
-
-elec = elecsample;
-solar = solarsample;
-time = timesample;
-
-% if filter_yr_2_day == 1
-%     %%% Reducing demand to a subset of demand
-%     yrly_8760_to_864
-%     
-%     %%%Using filter time
-%     elec=elec_filtered;
-%     time=time_filter;
-%     solar=solar_filter;
-%     
-%     %%%Date vectors for all time stamps
-%     datetimev=datevec(time);
-%     %%%Determining endpoints for all months - end pt is the data entry for a month
-%     counter=1;
-%     for i=2:length(time)
-%         if datetimev(i,2)~=datetimev(i-1,2)
-%             endpts(counter,1)=i-1;
-%             counter=counter+1;
-%         end
-%     end
-%     
-%     endpts(end)=length(time);
-%     
-% else
-%     day_multi=ones(length(elec),1);
-% end
+% 
+% kmedoids_demand_mpc
+% kmedoids_solar_mpc
+% 
+% elec = elecsample;
+% solar = solarsample;
+% time = timesample;
 
 
 %% Endpoints for all months - endpt is the hour index corresponding to the end of a month
@@ -119,21 +97,21 @@ else
     end
 end
 
-%% Load Allocation for the IEEE-33 bus 
+%% FARHAD 54 bldg Load Allocation for the IEEE-33 bus 
 %recreating elec vector -> each column is one building (from previous elec) to be used in the IEEE-33 test case, multiplied by the scaling factor
-
-%(1,K)
-multiplier = [0.31	0.52	0.2	0.19	0.08	0.26	0.33	0.24	0.1	0.05	0.13	0.03	0.08	0.04	0.036	0.021	0.054	0.11	0.093	0.041	0.047	0.061	0.45	0.073	0.082	0.26	0.065	0.114	0.061	0.054	0.075	0.054	0.123	0.02	0.1	0.32	0.29	0.255	0.242	0.097	0.035	0.146	0.0165	0.048	0.054	0.11	0.053	0.363	0.124	0.102	0.15	0.162	0.028	0.167];
-map = [9	2	5	3	7	8	2	6	9	5	9	5	8	7	6	7	6	4	9	7	9	7	9	7	8	2	9	5	7	6	5	6	5	6	5	6	1	8	10	9	6	9	6	9	6	8	4	11	5	7	5	7	4	2];
-
-K = length(multiplier);
-elec_ieee33 = zeros(size(elec,1),K);
-
-for i = 1:K
-    elec_ieee33(:,i) = multiplier(i)*elec(:,map(i));
-end 
-
-elec = elec_ieee33;
+% 
+% %(1,K)
+% multiplier = [0.31	0.52	0.2	0.19	0.08	0.26	0.33	0.24	0.1	0.05	0.13	0.03	0.08	0.04	0.036	0.021	0.054	0.11	0.093	0.041	0.047	0.061	0.45	0.073	0.082	0.26	0.065	0.114	0.061	0.054	0.075	0.054	0.123	0.02	0.1	0.32	0.29	0.255	0.242	0.097	0.035	0.146	0.0165	0.048	0.054	0.11	0.053	0.363	0.124	0.102	0.15	0.162	0.028	0.167];
+% map = [9	2	5	3	7	8	2	6	9	5	9	5	8	7	6	7	6	4	9	7	9	7	9	7	8	2	9	5	7	6	5	6	5	6	5	6	1	8	10	9	6	9	6	9	6	8	4	11	5	7	5	7	4	2];
+% 
+% K = length(multiplier);
+% elec_ieee33 = zeros(size(elec,1),K);
+% 
+% for i = 1:K
+%     elec_ieee33(:,i) = multiplier(i)*elec(:,map(i));
+% end 
+% 
+% elec = elec_ieee33;
 
 %% Power Factor, Utility Rates, Demand Charges vectors
 
@@ -156,3 +134,4 @@ for i=1:K
         dc_exist(i) = 1;
     end 
 end 
+

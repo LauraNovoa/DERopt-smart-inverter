@@ -41,17 +41,17 @@ VV_P3 = 0;
 
 mvw =  (VV_P3 - VV_P2) /  (VW_V3 - VW_V2 );
 
-active = binvar(T,K,2); %We have 2 other regions in the VW curve
+active2 = binvar(T,K,2); %We have 2 other regions in the VW curve
 
-Constraints = [ Constraints, (sum(active,3) == 1):'VW active binary'];
+Constraints = [ Constraints, (sum(active2,3) == 1):'VW active binary'];
 for k = 1:K
     tic;
     %First region 
     Constraints = [Constraints, (Pinv(:,k) <= inv_adopt(k)):['VW region 1, k=',num2str(k)]];   
     for t = 1:T      
-        Constraints = [ Constraints, sum(active,3) == 1,
-                        (implies(active(t,k,1), [ VV_V2 < Volts(T_map(k),t) < VV_V3, Pinv(t,k) <= mvw*(Volts(T_map(k),t)-1.06) ])):['implies VW 2,t=', num2str(t),', k=', num2str(k)];
-	                    (implies(active(t,k,2), [    Volts(T_map(k),t) > VV_V3, Pinv(t,k) == 0 ])):['implies VW 3,t=', num2str(t),', k=', num2str(k)];
+        Constraints = [ Constraints, sum(active2,3) == 1,
+                        (implies(active2(t,k,1), [ VV_V2 < Volts(T_map(k),t) < VV_V3, Pinv(t,k) <= mvw*(Volts(T_map(k),t)-1.06) ])):['implies VW 2,t=', num2str(t),', k=', num2str(k)];
+	                    (implies(active2(t,k,2), [    Volts(T_map(k),t) > VV_V3, Pinv(t,k) == 0 ])):['implies VW 3,t=', num2str(t),', k=', num2str(k)];
                       ];
     end 
     vwattk = toc;

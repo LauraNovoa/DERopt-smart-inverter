@@ -18,8 +18,8 @@ if isempty(utility_exists) == 0
         nontou_dc=sdpvar(M,sum(dc_exist),'full');
         
         %%%On Peak/ Mid Peak TOU DC
-        onpeak_dc=sdpvar(length(summer_month),sum(dc_exist),'full');
-        midpeak_dc=sdpvar(length(summer_month),sum(dc_exist),'full');
+        onpeak_dc=sdpvar(max(length(summer_month),1),sum(dc_exist),'full');
+        midpeak_dc=sdpvar(max(length(summer_month),1),sum(dc_exist),'full');
     end
     
     %%% Cost of Imports + Demand Charges 
@@ -91,9 +91,9 @@ if isempty(pv_v) == 0
  
     %%%PV Cost 
         Objective=Objective ...
-            + pv_v(1)*M*sum(pv_adopt)... %%%PV Capital Cost ($/kW installed)
+            + pv_v(1)*M*sum(pv_adopt)... %%%Capital Cost ($/kW installed)
             + pv_v(3)*( sum(sum(repmat(day_multi,1,K).*(pv_elec + ees_chrg_pv + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)    
-
+            %+ 23.47*sum(pv_adopt)        %%%Fixed O&M cost ($/kW installed)
 %% Renewable Electrical Energy Storage REES 
 if isempty(ees_v) == 0 && rees_exist == 1
 
@@ -113,7 +113,8 @@ if isempty(ees_v) == 0 && rees_exist == 1
         + ees_v(1)*M*sum(rees_adopt)...%%%Capital Cost
         + ees_v(2)*sum(sum(repmat(day_multi,1,K).*rees_chrg))... %%%Charging O&M
         + ees_v(3)*(sum(sum(repmat(day_multi,1,K).*(rees_dchrg + rees_dchrg_nem))));%%%Discharging O&M   
- 
+        %+ 91.8*sum(rees_adopt) %%%Fixed O&M Cost ($/kW installed)
+        
 if island == 0 % If not islanded, AEC can export NEM and wholesale for revenue
     %%%REES NEM Export Revenue
     rees_revenue = sdpvar(1,K,'full'); 
@@ -168,6 +169,7 @@ if isempty(ees_v) == 0
         + ees_v(1)*M*sum(ees_adopt)...%%%Capital Cost
         + ees_v(2)*sum(sum(repmat(day_multi,1,K).*ees_chrg))...%%%Charging O&M
         + ees_v(3)*sum(sum(repmat(day_multi,1,K).*ees_dchrg));%%%Discharging O&M
+        %+ 91.8*sum(ees_adopt)         %%%Fixed O&M cost ($/kW installed)
     
 else
     ees_adopt=zeros(1,K);

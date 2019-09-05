@@ -1,4 +1,5 @@
-%Allows residential curtailment
+%Prevents curtails at the DC levels (equality constraint)
+%Allows residential curtailment for smart-inverter Volt-Watt function
 
 %% PV Constraints
 if isempty(pv_v) == 0 

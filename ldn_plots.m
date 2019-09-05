@@ -1,13 +1,13 @@
 close all 
 %% Select plots 
-plot1 = 0; % AEC Dynamics for the entire year
+plot1 = 1; % AEC Dynamics for the entire year
 plot2 = 0; % AEC Dynamics for a given interval "dlength"
 plot1_1 = 0; %Building dynamics for the entire year
 plot2_1 = 0; %Building dynamics for dlength
 plot4 = 0; % AEC Dynamics subplots 
 plot5 = 0; % Transformer kVA limits subplot
 plot6 = 0; % Individual XFMR loading
-vpq = 1; % Voltage, Active and Reactive power comparison with ACPF MATPOWER
+vpq = 0; % Voltage, Active and Reactive power comparison with ACPF MATPOWER
 barinjections = 0;
 powererror =0 ;
 X_R = 0;
@@ -16,6 +16,7 @@ sflowall = 0; % Sflow for all branches colored by ampacity
 plot10 = 0;% k-medeoids 
 plot11 = 0;%testing
 plot12 = 0;%Building Dynamics subplots
+socplot = 1;
 
 %% Plot constants 
 xp = 1:1:T;  
@@ -964,8 +965,10 @@ if plot12 == 1
     end 
 end
 
+
 %% SOC 
-  %SOC for all 864 timesteps
+if socplot == 1 
+    
     fig = figure('Position', Position ,'PaperPositionMode','auto');
     ax = axes('Parent',fig);
     box(ax,'on'); hold(ax,'on');
@@ -977,18 +980,18 @@ end
     ylabel('Energy (kWh)');
     title('EES / REES Energy(kWh)');
   
-    fig = figure('Position', Position ,'PaperPositionMode','auto');
-    ax = axes('Parent',fig);
-    box(ax,'on'); hold(ax,'on');
-    ees_adopt_soc = ees_adopt; rees_adopt_soc = rees_adopt;
-    ees_adopt_soc(find(ees_adopt == 0))= 1; rees_adopt_soc(find(rees_adopt == 0))= 1;
-    h1 = plot(1:T,100*(ees_soc./ees_adopt_soc),'r-','LineWidth',0.6);hold on;
-    h2 = plot(1:T,100*(rees_soc./rees_adopt_soc),'b-','LineWidth',0.6);hold on;
-    axis tight;
-    legend([h1(1) h2(1)],'EES','REES');
-    xlabel('Optimization Timeframe');
-    ylabel('SOC (%)');
-    title('EES / REES SOC (%)');
+%     fig = figure('Position', Position ,'PaperPositionMode','auto');
+%     ax = axes('Parent',fig);
+%     box(ax,'on'); hold(ax,'on');
+%     ees_adopt_soc = ees_adopt; rees_adopt_soc = rees_adopt;
+%     ees_adopt_soc(find(ees_adopt == 0))= 1; rees_adopt_soc(find(rees_adopt == 0))= 1;
+%     h1 = plot(1:T,100*(ees_soc./ees_adopt_soc),'r-','LineWidth',0.6);hold on;
+%     h2 = plot(1:T,100*(rees_soc./rees_adopt_soc),'b-','LineWidth',0.6);hold on;
+%     axis tight;
+%     legend([h1(1) h2(1)],'EES','REES');
+%     xlabel('Optimization Timeframe');
+%     ylabel('SOC (%)');
+%     title('EES / REES SOC (%)');
 
     %%
     %SOC @ a given building b
@@ -1006,3 +1009,4 @@ end
 %     ylabel('Energy (kWh)');
 %     str = sprintf('EES / REES Energy(kWh) at building: %.0f',b);
 %     title(str);
+end 

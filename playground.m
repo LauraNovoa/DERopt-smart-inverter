@@ -1,6 +1,11 @@
 %% DER Optimization
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
+%% opt.m
+%%%Choose solver 
+opt_cplex = 0; %CPLEX, will do a model export YALMIP -> CPLEX
+opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
+
 %% Optimization Parameters
 
 %% Quick Constraints
@@ -13,17 +18,19 @@ nem_c = 1;       % On/Off NEM constraints
 dlpfc = 1;       % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
 lindist = 0;     % On/Off LinDistFlow constraints 
 socc = 0;        % On/Off SOC constraints
-voltage = 1;     % Use upped and lower limit for voltage 
-VH = 1.05;       % Low Voltage Limit (p.u.)
-VL = 0.95;       % High Voltage Limit(p.u.)
-branchC = 1;     % On/Off Banch kVA constraints
+voltage = 0;     % Use upped and lower limit for voltage 
+VH = 1.1;        % Low Voltage Limit (p.u.)
+VL = 0.9;        % High Voltage Limit(p.u.)
+branchC = 0;     % On/Off Banch kVA constraints
 primonly = 0;    % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
 Rmulti = 1;      % Multiplier for resistance in impedance matrix
+zne = 0.7;       % 1 = NET ZERO !!  
+minpf = 0;        % On/Off Min PF at the transfromer
 
 if dlpfc || lindist 
-    cnstrts = table(nopv,noees,tc,opt_t,ic,nem_c,dlpfc,lindist,voltage, VL,VH, branchC,primonly,Rmulti,'VariableNames',{'nopv','noees','tc','opt_t','ic','nem_c','dlpf','lindist','V','Vlow','Vhigh','Branch','primonly','Rmulti'})
+    cnstrts = table(nopv,noees,tc,opt_t,ic,nem_c,dlpfc,lindist,voltage, VL,VH, branchC,primonly,Rmulti,zne, minpf,opt_cplex,opt_yalmip, 'VariableNames',{'nopv','noees','tc','opt_t','ic','nem_c','dlpf','lindist','V','Vlow','Vhigh','Branch','primonly','Rmulti','ZNE','minpf','CPLEX','YALMIP'})
 else 
-    cnstrts = table(nopv,noees,tc,opt_t,ic,nem_c,dlpfc,lindist,Rmulti,'VariableNames',{'nopv','noees','tc','opt_t','ic','nem_c','dlpf','lindist','Rmulti'})
+    cnstrts = table(nopv,noees,tc,opt_t,ic,nem_c,dlpfc,lindist,Rmulti,zne,minpf,opt_cplex,opt_yalmip,'VariableNames',{'nopv','noees','tc','opt_t','ic','nem_c','dlpf','lindist','Rmulti','ZNE','minpf','CPLEX','YALMIP'})
 end 
 
 %% Load MATPOWER Test Case
@@ -43,47 +50,41 @@ end
 % Sb_rated(10) = []; Sb_rated(21) = []; Sb_rated(33) = [];
 
 %% For DERopt + DLPF Paper %84-node / 115-node + secondary 
-% %mpc = loadcase('caseAEC_XFMR_2') %84 node
-% %mpc = loadcase('caseAEC_XFMR_2_radial')
-% mpc = loadcase('caseAEC_XFMR_4')
-% 
-% [baseMVA, bus, gen, branch] = deal(mpc.baseMVA, mpc.bus, mpc.gen, mpc.branch);
-% N = size(bus,1);  %number of nodes
-% B = size(branch,1); %number of branches
-% 
-% mpc.branch(:,3) = Rmulti.*mpc.branch(:,3);
-% 
-% %T_map = [65 76	84	82	78	74	72	84	70	4	12	7	15	10	39	44	19	47	34	67	59	53	61	30	80	22	57	27	63	51	24];%Apr.10.19 %84-node
-% T_map = [106	111	115	114	112	110	109	101	108	85	88	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
-% 
-% load Sb_rated_86; Sb_rated = Sb_rated_86; %MVA %84-node / 115-node
-% 
-% Sb_extended = [0.04	0.04	0.04	0.04	0.04	0.04	0.08	0.08	0.08	0.08	0.04	0.04	0.04	0.04	0.04	0.04	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08]'; %115-node
-% Sb_rated = [Sb_rated ; Sb_extended]; % Add line drops Sb_rated  %115-node
-% 
-% %For radial case only
-% %Sb_rated(16) = []; Sb_rated(32) = []; Sb_rated(37) = [];
-
-
-%% IEEE-33 bus For MPC paper 
-mpc = loadcase('case33')
+%mpc = loadcase('caseAEC_XFMR_2') %84 node
+%mpc = loadcase('caseAEC_XFMR_2_radial')
+mpc = loadcase('caseAEC_XFMR_4')
 
 [baseMVA, bus, gen, branch] = deal(mpc.baseMVA, mpc.bus, mpc.gen, mpc.branch);
-N = size(bus,1);  %# of nodes
-B = size(branch,1); %# of branches
+N = size(bus,1);  %number of nodes
+B = size(branch,1); %number of branches
 
-%defined in opt_transformer_mpc.m
-%T_map = [ 2 3 4 5 6 7 8 9 10 11 ]; 
+mpc.branch(:,3) = Rmulti.*mpc.branch(:,3);
 
-Sb_rated = mpc.branch(:,6); %MVA 
+%T_map = [65 76	84	82	78	74	72	84	70	4	12	7	15	10	39	44	19	47	34	67	59	53	61	30	80	22	57	27	63	51	24];%Apr.10.19 %84-node
+T_map = [106	111	115	114	112	110	109	101	108	85	88	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
+
+load Sb_rated_86; Sb_rated = Sb_rated_86; %MVA %84-node / 115-node
+
+Sb_extended = [0.04	0.04	0.04	0.04	0.04	0.04	0.08	0.08	0.08	0.08	0.04	0.04	0.04	0.04	0.04	0.04	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08	0.08]'; %115-node
+Sb_rated = [Sb_rated ; Sb_extended]; % Add line drops Sb_rated  %115-node
+
+%For radial case only
+%Sb_rated(16) = []; Sb_rated(32) = []; Sb_rated(37) = [];
+
+%% IEEE-33 bus For MPC paper 
+% mpc = loadcase('case33')
+% 
+% [baseMVA, bus, gen, branch] = deal(mpc.baseMVA, mpc.bus, mpc.gen, mpc.branch);
+% N = size(bus,1);  %# of nodes
+% B = size(branch,1); %# of branches
+% 
+% %%T_map and T_rated defined in opt_transformer_mpc.m
+% 
+% Sb_rated = mpc.branch(:,6); %MVA 
 
 %% TRANSFORMER (opt_transformer.m)
-%tc = 1; % On/Off tranformer constraints 
-alpha = 1;
-
-%% Select Technologies
-%nopv = 0; %Turn off all PV
-%noees = 0; %Turn off all EES/REES
+%tc = 1;    % On/Off tranformer constraints 
+alpha = 1;  % Overload index for transformer
 
 %% Too little PV/EES
 toolittle_pv = 0;
@@ -99,7 +100,7 @@ net_import_on = 1;
 %Select NEM to be calculated annually or monthly 
 nem_annual = 1; nem_montly = 0;
 %%% 2) Export >= net_import_limit.*import % 
-net_import_limit = 1; % 1 = NET ZERO !!  
+%zne = 1; % 1 = NET ZERO !!  
 
 %% Island operation (opt_nem.m) 
 island = 0;
@@ -133,16 +134,11 @@ filtering = 0;
 window = 3; % minimum percent
 min_percent = 0.2; % if filtering = 2, the minimum load threshold as % of mean load
 
-%% opt.m
-%%%Choose optimizaiton solver 
-opt_cplex = 0; %CPLEX, will do a model export YALMIP -> CPLEX
-opt_yalmip = 1; %YALMIP, but calling CPLEX MILP solver
-
 %% Loading data 
 %% Building/solar data
-%bldg_loader_rjf %Use 864-hour reduced dataset
-%bldg_loader_rjf_2 %Only simulates worst-case RPF week
-bldg_loader_mpc % MPC IEEE-33 bus
+%bldg_loader_rjf   % Use 864-hour reduced dataset
+bldg_loader_rjf_2  % Only simulate worst-case RPF week
+%bldg_loader_mpc   % IEEE-33 bus
 
 %% Tech Parameters/Costs
 %%%Technology Parameters
@@ -205,8 +201,8 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% Transformer Constraints
 fprintf('%s: Transformer Constraints.', datestr(now,'HH:MM:SS'))
 ttime = tic;
-%opt_transformer
-opt_transformer_mpc
+opt_transformer %AEC 31 bldg
+%opt_transformer_mpc % IEEE-33 node case 
 elapsed = toc(ttime);
 fprintf('Took %.2f seconds \n', elapsed)
 
@@ -230,7 +226,7 @@ end
 %% Smart Inverter
 fprintf('%s: Smart Inverter.', datestr(now,'HH:MM:SS'))
 tic
-%opt_smart_inverter
+opt_smart_inverter
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
@@ -243,6 +239,7 @@ fprintf('Took %.2f seconds \n', elapsed)
 
 %% Optimize
 fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
+bounds
 opt
 
 %% Timer
@@ -266,4 +263,3 @@ else
 end
 
 adopt
-max(pv_curtail(:,10:19)) %check if residential is curtailing
