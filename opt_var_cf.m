@@ -29,9 +29,9 @@ if isempty(utility_exists) == 0
         index=find(ismember(rate_labels,rate(i)));
 
         %%%Energy rates for the electrical load
-        if i == 1
+        if i == 1 % Create first Objective variable
             Objective = import(:,i)'*(day_multi.*import_price(:,index));           
-        else
+        else      % Add remaining terms to Objective
             Objective = Objective + ...
             import(:,i)'*(day_multi.*import_price(:,index));        
         end  

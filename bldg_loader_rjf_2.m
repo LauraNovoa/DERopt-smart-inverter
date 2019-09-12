@@ -58,11 +58,19 @@ load 'solar_sna.mat'
 
 duckRPF
 
-elec = elec(idxweekRPF,:);
-time = time(idxweekRPF);
-datetimev = datetimev(idxweekRPF,:);
-solar = solar(idxweekRPF);
-day_multi=ones(length(elec),1);
+% elec = elec(idxweekRPF,:);
+% time = time(idxweekRPF);
+% datetimev = datetimev(idxweekRPF,:);
+% solar = solar(idxweekRPF);
+% % day_multi=ones(length(elec),1);
+%day_multi=ones(size(elec,1),1);
+
+%only siulate thet DAY of the worst case RPF
+elec = elec(d4,:);
+time = time(d4);
+datetimev = datetimev(d4,:);
+solar = solar(d4);
+day_multi=ones(size(elec,1),1);
 
 %% Endpoints for all months - endpt is the hour index corresponding to the end of a month
 counter=1;
@@ -75,7 +83,7 @@ end
 
 %If spans one month only
 if ~(exist('endpts'))
-    endpts = length(elec);
+    endpts = size(elec,1);
 end
 
 endpts

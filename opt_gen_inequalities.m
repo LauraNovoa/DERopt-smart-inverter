@@ -40,8 +40,8 @@ if utility_exists == 1
                 Constraints=[Constraints
                     % For each building k, the import for the days on summer that incur dc 
                     % needs to be <= onpeak_dc [summer_months,sum(dc_exist)] variable 
-                    import(on_index,k) <= onpeak_dc(i,dc_count)
-                    import(mid_index,k) <= midpeak_dc(i,dc_count)];
+                    (import(on_index,k) <= onpeak_dc(i,dc_count)):'TOU Demand Charge On Peak'
+                    (import(mid_index,k) <= midpeak_dc(i,dc_count)):'TOU Demand Charge Mid Peak'];
             end
           end 
             

@@ -19,7 +19,7 @@ if opt_t
     
     T_rated = sdpvar(1,N,'full');  %T_rated as decision variable 
   
-    Objective = Objective + xfmr_v(1)*sum(T_rated); %Add to objective transformer cost to objective function
+    Objective = Objective + xfmr_v(1)*sum(T_rated); %Add to objective transformer cost
 
     %T_rated can only assume a list of possible values
     possiblevalues = [0,10,15,25,37.5,50,75,100,167,200,225,300,500,750,1000,1500,2000,3000,4000,5000,6000,7000,10000,20000];
@@ -57,6 +57,8 @@ Pinj = sdpvar(T,N,'full'); %kW
 Qinj = sdpvar(T,N,'full'); %kVAR 
 Pinj_in = sdpvar(T,N,'full'); %kW
 Qinj_in = sdpvar(T,N,'full'); %kVAR
+Pinj_out = sdpvar(T,N,'full'); %kW
+Qinj_out = sdpvar(T,N,'full'); %kVAR
 
 %Transformer Polygon Constraints
 L = 20; % number of line segments of the polygon
@@ -65,31 +67,44 @@ theta = pi/L + i.*(2*pi)./L; %rad
 C = [cos(theta)' sin(theta)'];
 s = T_rated*cos(theta(1));
 
-%Define P and Q flows thru XFMR (Pinj and Qinj)
+% P and Q flows thru XFMR (Pinj and Qinj)
 for n=1:N % For each node n
     cluster = find(T_map == n); % return vector of building # (k) connected to node n
     if isempty(cluster) == 0    % if node n is a XFMR node (there is a building connected to that node) calculate P and Q injections
       
+      %XFMR P flows %kW
       Constraints = [Constraints 
           (Pinj(:,n) == sum(import(:,cluster) - pv_nem(:,cluster) - pv_wholesale(:,cluster) - rees_dchrg_nem(:,cluster),2)):'Pinj'
           (Pinj_in(:,n) == sum(import(:,cluster),2)):'Pinj_in'
-          (Qinj(:,n) == sum(Qimport(:,cluster) + Qind(:,cluster) - Qcap(:,cluster),2)):'Qinj'
-          (Qinj_in(:,n) == sum(Qimport(:,cluster) + Qind(:,cluster),2)):'Qinj_in']; %kVAR 
+          (Pinj_out(:,n) == sum(pv_nem(:,cluster) + pv_wholesale(:,cluster) + rees_dchrg_nem(:,cluster),2)):'Pinj_out'
+          ];
       
-        if tc ==1 %Add transformer kVA rating polygon constraint 
-            Constraints = [Constraints, (C*[Pinj(:,n)';Qinj(:,n)'] <= alpha*s(n)):'Transformer Polygon'];
-            Constraints = [Constraints, (sum(import(:,cluster),2) <= alpha*T_rated(n)):'Transformer IN Limit'];
-            Constraints = [Constraints, (sum(pv_nem(:,cluster),2) + sum(pv_wholesale(:,cluster),2) + sum(rees_dchrg_nem(:,cluster),2)  <= alpha*T_rated(n)):'Transformer OUT Limit'];
+      %XFMR Q flows %kVAR 
+           Constraints = [Constraints 
+            (Qinj(:,n) == sum(Qimport(:,cluster) + Qind(:,cluster) - Qcap(:,cluster),2)):'Qinj' 
+            (Qinj_in(:,n) == sum(Qimport(:,cluster) + Qind(:,cluster),2)):'Qinj_in'
+            (Qinj_out(:,n) == sum(Qcap(:,cluster),2)):'Qinj_out'
+            ]; 
+                      
+        if tc ==1 %Transformer kVA rating polygon constraint 
+            Constraints = [Constraints, 
+                (C*[Pinj(:,n)';Qinj(:,n)'] <= alpha*s(n)):'Transformer Polygon'
+                (sum(import(:,cluster),2) <= alpha*T_rated(n)):'Transformer P IN Limit'
+                (sum(pv_nem(:,cluster),2) + sum(pv_wholesale(:,cluster),2) + sum(rees_dchrg_nem(:,cluster),2)  <= alpha*T_rated(n)):'Transformer P OUT Limit'
+                (Qinj_in(:,n) <= alpha*T_rated(n)):'Transformer Q IN Limit'
+                (Qinj_out(:,n)<= alpha*T_rated(n)):'Transformer Q OUT Limit'  
+            ];
+            
         end 
       
-    else % if connection node, Pinj, Qinj = 0 (so it does not show solution as NaN)
+    else % if connection node, Pinj, Qinj = 0 
         Pinj(:,n) = zeros(T,1);
         Qinj(:,n) = zeros(T,1);
     end
 end
 
 %% Fixing min power factor at the transformer
-% Just so Qimport is not too large 
+% To limit Qimport 
 
 if minpf == 1
     

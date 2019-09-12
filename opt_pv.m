@@ -1,7 +1,17 @@
+%Differentiates between smart inverter and opt PQ 
+%For SI:
+%Prevents curtails at the DC level (equality constraint)
+%Allows residential curtailment (Volt-Watt function)
+
 %% PV Constraints
 if isempty(pv_v) == 0 
-    Constraints = [Constraints, (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance'];
-
+    if invertermode == 1
+        % Do not curtail PV at the DC level
+            Constraints = [Constraints, (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance'];   
+    else     
+           % Allow PV curtail at the DC level
+            Constraints = [Constraints, (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance'];
+    end 
 %% Min PV to adopt: 3 kW
 if toolittle_pv ==1 
   for k=1:K
@@ -16,10 +26,10 @@ if pv_maxarea
 end
 
 %% Don't curtail for residential
-residential = find(strcmp(rate,'R1') |strcmp(rate,'R2') | strcmp(rate,'R3')| strcmp(rate,'R4'));
-
-Constraints = [Constraints,...
-     ( solar*pv_adopt(residential) ==  pv_wholesale(:,residential) + pv_elec(:,residential) + ees_chrg_pv(:,residential) + pv_nem(:,residential) + rees_chrg(:,residential)):'No residential curtail' ];
+% residential = find(strcmp(rate,'R1') |strcmp(rate,'R2') | strcmp(rate,'R3')| strcmp(rate,'R4'));
+% 
+% Constraints = [Constraints,...
+%      ( solar*pv_adopt(residential) ==  pv_wholesale(:,residential) + pv_elec(:,residential) + ees_chrg_pv(:,residential) + pv_nem(:,residential) + rees_chrg(:,residential)):'No residential curtail' ];
 
 %% 
 % Limit PV adoption

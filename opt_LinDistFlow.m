@@ -52,9 +52,9 @@
 
     %LinDistFlow for linearized Volts, Pflow, and Qflow
          Constraints = [Constraints...,
-             Volts == [repmat(slack_voltage^2,1,T) ; slack_voltage^2+R*(Pinj'/1e3/baseMVA)+X*(Qinj'/1e3/baseMVA)] %p.u.^2
-             Pflow == baseMVA*(C+I)*To*(Pinj'/1e3/baseMVA) %MW
-             Qflow == baseMVA*(C+I)*To*(Qinj'/1e3/baseMVA) %MVAR
+             (Volts == [repmat(slack_voltage^2,1,T) ; slack_voltage^2+R*(Pinj'/1e3/baseMVA)+X*(Qinj'/1e3/baseMVA)]):'LinDist Volts' %p.u.^2
+             (Pflow == baseMVA*(C+I)*To*(Pinj'/1e3/baseMVA)):'LinDist Pflow' %MW
+             (Qflow == baseMVA*(C+I)*To*(Qinj'/1e3/baseMVA)):'LinDist Qflow' %MVAR
              ]; 
          
         %Setting up Polygon Constraints
@@ -80,7 +80,7 @@
         
         %Voltage constraints
         if voltage
-          Constraints = [Constraints, (VL^2 <= Volts <= VH^2):'LinDist Voltage'];
+          Constraints = [Constraints, ];
         end 
 
   

@@ -20,12 +20,13 @@ pallete = bright;
     end 
 
     
- k=11; %Choose building #
+ k=2; %Choose building #
  s=t/50; %spacing for x axis
- tlim1 = 0
- tlim2 = 100; % Limit for x-axis (for all plots)
+ tlim1 = 0;
+ tlim2 = 24; % Limit for x-axis (for all plots)
 
- legon = 1;
+ legon = 0;
+ leglocation = 'northoutside'
  alpha = 1; %08 for ransparent legend 
  
 %%  Inverter dynamics
@@ -52,9 +53,9 @@ pallete = bright;
     h9 = plot(1:t,-(ees_dchrg(:,k) + rees_dchrg(:,k) + rees_dchrg_nem(:,k)),'Color',[pallete(7,:) 1],'LineStyle','-','LineWidth',1.0);
     l =  line(1:t,ones(1,t)*inv_adopt(k),'Color',[pallete(8,:) 1],'LineStyle',':','LineWidth',2.0);hold on;
  
-    %[leg, objects ] = legend('Pinv (+)import (-)export','Qinv = -Qelec + Qanc (+) import/ind','Sinv = sqrt(Pinv^2 + Qinv^2)','Qelec','Qanc inv (+) import/ind','Qimport bldg','PV (DC) generation','EES+REES dch (DC)','Inverter kVA','Location','best');
+    %[leg, objects ] = legend('Pinv (+)import (-)export','Qinv = -Qelec + Qanc (+) import/ind','Sinv = sqrt(Pinv^2 + Qinv^2)','Qelec','Qanc inv (+) import/ind','Qimport bldg','PV (DC) generation','EES+REES dch (DC)','Inverter kVA','Location',leglocation);
     if legon
-        [leg, objects ] = legend('Pinv (+)import (-)export','Qinv = -Qelec + Qind - Qcap (+) import/ind','Sinv = sqrt(Pinv^2 + Qinv^2)','Qelec','Qind (+)','Qcap (-)','Qimport bldg','PV (DC) generation','EES+REES dch (DC)','Inverter kVA','Location','best');
+        [leg, objects ] = legend('Pinv (+)import (-)export','Qinv = -Qelec + Qind - Qcap (+) import/ind','Sinv = sqrt(Pinv^2 + Qinv^2)','Qelec','Qind (+)','Qcap (-)','Qimport bldg','PV (DC) generation','EES+REES dch (DC)','Inverter kVA','Location',leglocation);
         leg.BoxFace.ColorType = 'truecoloralpha';
         leg.BoxFace.ColorData = uint8([234 234 242 242*alpha]');
     end
@@ -103,9 +104,9 @@ pallete = bright;
     h6 = plot(1:t,-Qcap(:,k),'Color',[pallete(1,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
     l =  line(1:t,ones(1,t)*T_rated(T_map(k)),'Color',[pallete(8,:) 1],'LineStyle',':','LineWidth',2.0);
  
-    %[leg, objects ] = legend('Pinj (+) import','Qinj = Qimport + Qanc (+) import/ind','Sinj (+) import/ind','Qimport (+)','Qanc (+)import/ind','Transformer kVA','Location','best');
+    %[leg, objects ] = legend('Pinj (+) import','Qinj = Qimport + Qanc (+) import/ind','Sinj (+) import/ind','Qimport (+)','Qanc (+)import/ind','Transformer kVA','Location',leglocation);
     if legon
-        [leg, objects ] = legend('Pinj (+) import','Qinj = Qimport + Qanc (+) import/ind','Sinj (+) import/ind','Qimport (+)','Qind (+)','Qcap (-)','Transformer kVA','Location','best');
+        [leg, objects ] = legend('Pinj (+) import','Qinj = Qimport + Qanc (+) import/ind','Sinj (+) import/ind','Qimport (+)','Qind (+)','Qcap (-)','Transformer kVA','Location',leglocation);
         leg.BoxFace.ColorType = 'truecoloralpha';
         leg.BoxFace.ColorData = uint8([234 234 242 242*alpha]');
     end 
@@ -231,7 +232,7 @@ pallete = bright;
     h3 = plot(1:t,pf(k)*ones(t),'Color',[pallete(11,:) 1],'LineStyle','none','LineWidth',0.5,'Marker','o','MarkerSize',5,'MarkerFaceColor',pallete(7,:));
     
     if legon
-    [leg, objects ] = legend('PF inverter (+) leading/cap (-) lagging/ind','PF XFMR',sprintf('PF Bldg: %.1f', pf(k)),'Location','best');
+    [leg, objects ] = legend('PF inverter (+) leading/cap (-) lagging/ind','PF XFMR',sprintf('PF Bldg: %.1f', pf(k)),'Location',leglocation);
     leg.BoxFace.ColorType = 'truecoloralpha';
     leg.BoxFace.ColorData = uint8([234 234 242 242*alpha]');  
     end 
@@ -246,6 +247,3 @@ pallete = bright;
     %set(ax,'yticklabel',num2str(tix,'%.0f'));
     ax.YMinorTick = 'on';
     
-    %% 
-    figure
-    plot(BusVolAC)

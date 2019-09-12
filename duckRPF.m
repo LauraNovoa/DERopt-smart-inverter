@@ -8,7 +8,7 @@ duck  = Totalelec - Solar;
 [sortduck,idx]= sort(duck);
 
 %Ten worst RPF
-tenworstRPF = datetimev(idx(1:10),:)
+tenworstRPF = datetimev(idx(1:10),:);
 
 %Get month, day, and hour from time
 month = datetimev(:,2); day = datetimev(:,3); hour = datetimev(:,4);

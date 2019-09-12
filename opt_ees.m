@@ -49,7 +49,7 @@ if isempty(ees_v) == 0
                       (repmat(ees_v(4,:).*rees_adopt,T,1) <= rees_soc <= repmat(ees_v(5,:).*rees_adopt,T,1)):'REES Min/Max SOC' %%%Min/Max SOC 
                       (rees_chrg <= repmat(ees_v(6,:).*rees_adopt,T,1)):'REES Charge'  %%Charging, charigng power <= max charge Rate
                       (rees_dchrg_nem + rees_dchrg <= repmat(ees_v(7,:).*rees_adopt,T,1)):'REES Discharge' %%%Discharging, discharigng power <= max discharge rate
-                      ];           
+                      ]; 
 
         end
     end

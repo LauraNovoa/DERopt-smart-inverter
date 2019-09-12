@@ -1,4 +1,5 @@
-%Prevents curtails at the DC levels (equality constraint)
+%Only for SI functions 
+%Prevents curtails at the DC level (equality constraint)
 %Allows residential curtailment for smart-inverter Volt-Watt function
 
 %% PV Constraints

@@ -1,36 +1,41 @@
 %% DER Optimization
 clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
-%% opt.m
-%%%Choose solver 
-opt_cplex = 0; %CPLEX, will do a model export YALMIP -> CPLEX
-opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
+%% Optimization Solver
+%%% Choose solver 
+opt_cplex = 1; %CPLEX, will do a model export YALMIP -> CPLEX
+opt_yalmip = 0; %YALMIP,calling CPLEX MILP solver
 
 %% Optimization Parameters
 
 %% Quick Constraints
-nopv = 0;        % Turn off all PV
-noees = 0;       % Turn off all EES/REES
-tc = 1;          % On/Off transformer constraints
-opt_t = 0;       % On/Off optimize transformer size (T_rated)
-ic = 1;          % On/Off inverter constraints
-nem_c = 1;       % On/Off NEM constraints 
-dlpfc = 1;       % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
-lindist = 0;     % On/Off LinDistFlow constraints 
-socc = 0;        % On/Off SOC constraints
-voltage = 0;     % Use upped and lower limit for voltage 
-VH = 1.1;        % Low Voltage Limit (p.u.)
-VL = 0.9;        % High Voltage Limit(p.u.)
-branchC = 0;     % On/Off Banch kVA constraints
-primonly = 0;    % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
-Rmulti = 1;      % Multiplier for resistance in impedance matrix
-zne = 0.7;       % 1 = NET ZERO !!  
-minpf = 0;        % On/Off Min PF at the transfromer
+nopv = 0;                  % Turn off all PV
+noees = 0;                 % Turn off all EES/REES
+toolittle_pv = 0;          % min size for PV adoption = 3 kW
+toolittle_storage = 0;     % min size for EES adoption = 13.5 kWh (Powerwall) 
+pv_maxarea = 0;            % limit area for PV adoption 
+tc = 0;                    % On/Off transformer constraints
+opt_t = 0;                 % On/Off optimize transformer size (T_rated)
+ic = 1;                    % On/Off inverter polygon constraints
+invertermode = 3;          % (1) Standard (2) Optimal PQ, (3) Smart-Inveter with droop-control
+nem_c = 1;                 % On/Off NEM constraints 
+zne = 1;                   % 1 = 100% ZNE ! (At the building level)
+dlpfc = 0;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
+lindist = 1;               % On/Off LinDistFlow constraints 
+socc = 0;                  % On/Off SOC constraints
+voltage = 1;               % Use upped and lower limit for voltage 
+VL = 0.90;                 % High Voltage Limit(p.u.)
+VH = 1.1;                  % Low Voltage Limit (p.u.)
+branchC = 0;               % On/Off Banch kVA constraints
+primonly = 0;              % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
+minpf = 0;                 % On/Off Min PF at the transfromer
+VV = 1;                    % On/Off Volt-Var
+VW = 0;                    % On/Off Volt-Watt
 
 if dlpfc || lindist 
-    cnstrts = table(nopv,noees,tc,opt_t,ic,nem_c,dlpfc,lindist,voltage, VL,VH, branchC,primonly,Rmulti,zne, minpf,opt_cplex,opt_yalmip, 'VariableNames',{'nopv','noees','tc','opt_t','ic','nem_c','dlpf','lindist','V','Vlow','Vhigh','Branch','primonly','Rmulti','ZNE','minpf','CPLEX','YALMIP'})
+    cnstrts = table(nopv,noees,tc,opt_t,ic,invertermode,nem_c, zne,dlpfc,lindist,voltage, VL,VH, branchC,primonly,toolittle_pv,toolittle_storage,pv_maxarea, minpf,opt_cplex,opt_yalmip, 'VariableNames',{'nopv','noees','tc','opt_t','ic','invmode','nem_c','ZNE','dlpf','lindist','V','Vlow','Vhigh','Branch','primonly','MinPV','MinEES','MaxPVarea','minpf','CPLEX','YALMIP'})
 else 
-    cnstrts = table(nopv,noees,tc,opt_t,ic,nem_c,dlpfc,lindist,Rmulti,zne,minpf,opt_cplex,opt_yalmip,'VariableNames',{'nopv','noees','tc','opt_t','ic','nem_c','dlpf','lindist','Rmulti','ZNE','minpf','CPLEX','YALMIP'})
+    cnstrts = table(nopv,noees,tc,opt_t,ic,invertermode,nem_c, zne,dlpfc,lindist,toolittle_pv,toolittle_storage,pv_maxarea,minpf,opt_cplex,opt_yalmip,'VariableNames',{'nopv','noees','tc','opt_t','ic','invmode','nem_c','ZNE','dlpf','lindist','MinPV','MinEES','MaxPVarea','minpf','CPLEX','YALMIP'})
 end 
 
 %% Load MATPOWER Test Case
@@ -58,6 +63,8 @@ mpc = loadcase('caseAEC_XFMR_4')
 N = size(bus,1);  %number of nodes
 B = size(branch,1); %number of branches
 
+Rmulti = 1;      % Multiplier for resistance in impedance matrix
+
 mpc.branch(:,3) = Rmulti.*mpc.branch(:,3);
 
 %T_map = [65 76	84	82	78	74	72	84	70	4	12	7	15	10	39	44	19	47	34	67	59	53	61	30	80	22	57	27	63	51	24];%Apr.10.19 %84-node
@@ -83,43 +90,32 @@ Sb_rated = [Sb_rated ; Sb_extended]; % Add line drops Sb_rated  %115-node
 % Sb_rated = mpc.branch(:,6); %MVA 
 
 %% TRANSFORMER (opt_transformer.m)
-%tc = 1;    % On/Off tranformer constraints 
 alpha = 1;  % Overload index for transformer
 
-%% Too little PV/EES
-toolittle_pv = 0;
-toolittle_storage = 0;
-
-%% PV (opt_pv.m)
-pv_maxarea = 0;
-
-%% NEM (opt_nem.m) 
-%nem_c = 0; %On/Off NEM constraints 
-%%% 1) NEM Credits to be less than Import Cost
+%% NEM/ZNE (opt_nem.m) 
+%%% NEM Credits to be less than Import Cost
 net_import_on = 1;
-%Select NEM to be calculated annually or monthly 
+%%% Select NEM to be calculated annually or monthly 
 nem_annual = 1; nem_montly = 0;
-%%% 2) Export >= net_import_limit.*import % 
-%zne = 1; % 1 = NET ZERO !!  
-
-%% Island operation (opt_nem.m) 
-island = 0;
-load_shedding = 0.5; %Asusming 1-x% of the AEC load can be shed in case of a non-planned islanding. elec = load_shedding*elec
 
 %% EES (opt_ees.m)
 %%% Avoid simultaneous Charge and Discharge (xd & xc binaries)
 ees_onoff = 0; 
-%socc = 0; % SOC constraint: for each individual ees and rees, final SOC >= Initial SOC
 
 %% REES (opt_var_cf.m)
-%%%Allow renewable storage decision using EES type
+%%% Allow renewable storage decision using EES type
 rees_exist = 1;
 
 %% Grid limits 
 %%% On/Off Grid Import Limit 
 grid_import_on = 0;
-%%%Limit on grid import power  
+%%% Limit on grid import power  
 import_limit = .8;
+
+%% Island operation (opt_nem.m) 
+%%% Close the breaker!
+island = 0;
+load_shedding = 0.5; %Asusming 1-x% of the AEC load can be shed in case of a non-planned islanding. elec = load_shedding*elec
 
 %% Building demand (blgd_loader.m)
 bldgnum = 'AEC';
@@ -134,10 +130,9 @@ filtering = 0;
 window = 3; % minimum percent
 min_percent = 0.2; % if filtering = 2, the minimum load threshold as % of mean load
 
-%% Loading data 
-%% Building/solar data
+%% Building demand /solar PV data
 %bldg_loader_rjf   % Use 864-hour reduced dataset
-bldg_loader_rjf_2  % Only simulate worst-case RPF week
+bldg_loader_rjf_2  % Only simulate worst-case RPF week/day
 %bldg_loader_mpc   % IEEE-33 bus
 
 %% Tech Parameters/Costs
@@ -158,7 +153,7 @@ elec_vecs
 %% Setting up variables and Objective function
 fprintf('%s: Objective Function.', datestr(now,'HH:MM:SS'))
 tic
-opt_var_cf %%%Added NEM and wholesale export to the PV Section
+opt_var_cf 
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
@@ -179,8 +174,8 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% Solar PV Constraints
 fprintf('%s: PV Constraints.', datestr(now,'HH:MM:SS'))
 tic
-%opt_pv
-opt_pv_2 
+opt_pv
+%opt_pv_2 
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
@@ -194,8 +189,7 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% Inverter Constraints
 fprintf('%s: Inverter Constraints.', datestr(now,'HH:MM:SS'))
 ttime = tic;
-%opt_inverter
-opt_inverter_2
+opt_inverter % Opt PQ with Qelec
 elapsed = toc(ttime);
 fprintf('Took %.2f seconds \n', elapsed)
 %% Transformer Constraints
@@ -207,7 +201,7 @@ elapsed = toc(ttime);
 fprintf('Took %.2f seconds \n', elapsed)
 
 %% DLPF
-if dlpfc ==1 
+if dlpfc == 1
     fprintf('%s: DLPF.', datestr(now,'HH:MM:SS'))
     tic
     opt_DLPF
@@ -215,7 +209,7 @@ if dlpfc ==1
     fprintf('Took %.2f seconds \n', elapsed)
 end 
 %% LinDistFlow 
-if lindist ==1 
+if lindist == 1  
     fprintf('%s: LinDist.', datestr(now,'HH:MM:SS'))
     tic
     opt_LinDistFlow
@@ -224,12 +218,13 @@ if lindist ==1
 end 
 
 %% Smart Inverter
-fprintf('%s: Smart Inverter.', datestr(now,'HH:MM:SS'))
-tic
-opt_smart_inverter
-elapsed = toc;
-fprintf('Took %.2f seconds \n', elapsed)
-
+if invertermode == 3
+    fprintf('%s: Smart Inverter.', datestr(now,'HH:MM:SS'))
+    tic
+    opt_smart_inverter
+    elapsed = toc;
+    fprintf('Took %.2f seconds \n', elapsed)
+end 
 %% NEM Constraints
 fprintf('%s: NEM Constraints.', datestr(now,'HH:MM:SS'))
 tic
@@ -250,7 +245,7 @@ yalmip_value
 
 %% Post-processing and plots
 ldn_post
-%ldn_plots
+ldn_plots
 
 check_constraints = min(check(Constraints));
 [primal, dual ] = check(Constraints);
@@ -259,7 +254,22 @@ if check_constraints <= -1
     fprintf('Constraints violated:')
     check(Constraints(find(primal <= check_constraints)))
 else 
-    fprintf('YAS No Constraints violated!!!! ')
+    fprintf('No Constraints violated!!!! ')
 end
 
 adopt
+
+quickplot 
+
+figure
+plot(BusVolAC)
+title(sprintf('True AC Voltage range: %.3f - %.3f p.u.',min(min(BusVolAC)),max(max(BusVolAC))))
+xlabel('Node')
+ylabel('Volts (p.u.)')
+
+figure
+plot(Volts)
+title(sprintf('Linearized AC Voltage range: %.3f - %.3f p.u.',min(min(Volts)),max(max(Volts))))
+xlabel('Node')
+ylabel('Volts (p.u.)')
+

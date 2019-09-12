@@ -51,6 +51,7 @@ if opt_yalmip
     ops.cplex.mip.limits.nodes=60000;
     
     %Optimize!
-    sol = optimize(Constraints,Objective,ops)
-    %sol = optimize(Constraints,[],ops) %remove objective function to debug unfeasible problems 
+    %sol = optimize(Constraints,Objective)    %Let YALMIP chose solver
+    sol = optimize(Constraints,Objective,ops) %Optimize with CPLEX and options above
+    %sol = optimize(Constraints,[],ops)       %Remove objective function to debug unfeasible problems 
 end

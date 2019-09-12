@@ -67,7 +67,9 @@ Pinj = value(Pinj); %Pinj(isnan(Pinj)) = 0; %kW
 Qinj = value(Qinj); %Qinj(isnan(Pinj)) = 0; %kVAR
 Sinj = sqrt(Pinj.^2 + Qinj.^2); %Absolute value %kVA 
 %Sinj = Pinj./cos(atan(Qinj./Pinj)); %kVA %Captures the (+) and (-) flows 
-z = value(z);
+if minpf 
+    z = value(z);
+end
 
 if opt_t 
     T_rated = value(T_rated);
@@ -84,8 +86,14 @@ Qcap = value(Qcap); %kVAR
 Qelec = value(Qelec); %kVAR
 Qimport = value(Qimport); %kVAR
 %Sinv = Pinv./cos(atan(Qinv./Pinv)); %kVA %Captures the (+) and (-) flows 
-active = value(active);
-active2 = value(active2);
+if invertermode == 3
+    if VV ==1
+        active = value(active);
+    end 
+    if VW ==1
+        active2 = value(active2);
+    end 
+end
 
 %DLPF
 if dlpfc == 1
