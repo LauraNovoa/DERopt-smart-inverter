@@ -80,18 +80,20 @@ inv_adopt = value(inv_adopt);
 Pinv = value(Pinv); %kW
 Qinv = value(Qinv); %kVAR
 Sinv = sqrt(Pinv.^2 + Qinv.^2);%Absolute value  %kVA 
-%Qanc = value(Qanc); %kVAR
-Qind = value(Qind); %kVAR
-Qcap = value(Qcap); %kVAR
+Qanc = value(Qanc); %kVAR
+Qind = zeros(size(Qanc)); Qind(Qanc>0)= Qanc(Qanc>0);
+Qcap = zeros(size(Qanc)); Qcap(Qanc<0)= Qanc(Qanc<0);
+%Qind = value(Qind); %kVAR
+%Qcap = value(Qcap); %kVAR
 Qelec = value(Qelec); %kVAR
 Qimport = value(Qimport); %kVAR
 %Sinv = Pinv./cos(atan(Qinv./Pinv)); %kVA %Captures the (+) and (-) flows 
 if invertermode == 3
     if VV ==1
-        active = value(active);
+        %active = value(active);
     end 
     if VW ==1
-        active2 = value(active2);
+        %active2 = value(active2);
     end 
 end
 

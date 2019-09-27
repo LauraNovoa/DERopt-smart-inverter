@@ -12,7 +12,8 @@ if VV
     mcap = (VV_Q2 - VV_Q1)/(VV_V2 - VV_V1);
     mind = (VV_Q4 - VV_Q3)/(VV_V4 - VV_V3);
 
-    active = binvar(T,K,5); %There are 5 regions in the VV curve
+   %active = binvar(T,K,5); %There are 5 regions in the VV curve
+   active = binvar(T,K,3); %There are 3 regions in the VV curve %Reduced curve
 
     %Only one region can be active at a time
     Constraints = [ Constraints, (sum(active,3) == 1):'VV binary active sum = 1 '];
@@ -25,20 +26,21 @@ if VV
                             %(implies(active(t,k,1), [ Volts(T_map(k),t) <= VV_V1, Qcap(t,k) == VV_Q1*inv_adopt(k) ])):['implies VV 1,t=', num2str(t),', k=', num2str(k)]; 
                             %(implies(active(t,k,2), [ Volts(T_map(k),t) >= VV_V4, Qind(t,k) == VV_Q4*inv_adopt(k) ])):['implies VV 2,t=', num2str(t),', k=', num2str(k)];
                             %(implies(active(t,k,3), [ VV_V3 < Volts(T_map(k),t) < VV_V4, Qind(t,k) ==  mind*(Volts(T_map(k),t)-VV_V3)])):['implies VV 3,t=', num2str(t),', k=', num2str(k)];
-                            (implies(active(t,k,4), [ VV_V2 <= Volts(T_map(k),t) <= VV_V3, Qind(t,k) == 0, Qcap == 0 ])):['implies VV 4,t=', num2str(t),', k=', num2str(k)];
+                            %(implies(active(t,k,4), [ VV_V2 <= Volts(T_map(k),t) <= VV_V3, Qind(t,k) == 0, Qcap == 0 ])):['implies VV 4,t=', num2str(t),', k=', num2str(k)];
                             %(implies(active(t,k,5), [ VV_V1 < Volts(T_map(k),t) < VV_V2, Qcap(t,k) == mcap*(Volts(T_map(k),t)- VV_V2)])):['implies VV 5,t=', num2str(t),', k=', num2str(k)];
                           ];
                
                %[X,Y] = meshgrid(0.7:0.1:1.2,0:20:1500);
-               [X,Y] = meshgrid(0.9:0.1:1.1,0:50:1500);
+               [X,Y] = meshgrid(0.9:0.1:1.1,0:100:1500);
                Z1sq = (0.5*(mind*(X-VV_V3)+Y)).^2;
                Z2sq = (0.5*(mind*(X-VV_V3)-Y)).^2;
-               z1sq = interp2(X,Y,Z1sq,Volts(T_map(k),t),inv_adopt(k),'milp');
-               z2sq = interp2(X,Y,Z2sq,Volts(T_map(k),t),inv_adopt(k),'milp');                   
+               z1sq = interp2(X,Y,Z1sq,Volts(T_map(k),t),inv_adopt(k),'sos2');
+               z2sq = interp2(X,Y,Z2sq,Volts(T_map(k),t),inv_adopt(k),'sos2');                   
                
                 Constraints = [ Constraints
+                                (implies(active(t,k,1), [ VV_V1 < Volts(T_map(k),t) < VV_V2, Qcap(t,k) == 0])):['implies VV 1,t=', num2str(t),', k=', num2str(k)];
+                                (implies(active(t,k,2), [ VV_V2 < Volts(T_map(k),t) < VV_V3, Qind(t,k) == 0, Qcap == 0 ])):['implies VV 2,t=', num2str(t),', k=', num2str(k)];                
                                 (implies(active(t,k,3), [ VV_V3 < Volts(T_map(k),t) < VV_V4, Qind(t,k) ==  z1sq - z2sq])):['implies VV 3,t=', num2str(t),', k=', num2str(k)];
-                                (implies(active(t,k,5), [ VV_V1 < Volts(T_map(k),t) < VV_V2, Qcap(t,k) == 0])):['implies VV 5,t=', num2str(t),', k=', num2str(k)];
                                 0<=z1sq <= 99999;
                                 0<=z2sq <= 99999;
                               ];

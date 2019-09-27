@@ -20,7 +20,7 @@ Qind = sdpvar(T,K,'full'); %kVAR
 
 %Objective = Objective + sum(sum(Qind)) + sum(sum(Qcap)); % Adding this with the hopes of reducing Qind anc Qcap
 
-Objective = Objective + sum(sum(Qimport)); % Adding this with the hopes of reducing Qimport and meeting Qbldg qith Qelec
+%Objective = Objective + sum(sum(Qimport)); % Adding this with the hopes of reducing Qimport and meeting Qbldg qith Qelec
 
     Constraints = [Constraints 
         (Pinv == Pinv_in - Pinv_out):'Pinv'

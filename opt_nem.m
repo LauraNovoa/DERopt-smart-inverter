@@ -6,10 +6,17 @@ if nem_c == 1
         %%%Current Utility Rate
         index=find(ismember(rate_labels,rate(k)));
         
-        %%%NEM Credits to be less than Import Cost
-        Constraints = [Constraints
-            (export_price(:,index)'*(rees_dchrg_nem(:,k)+pv_nem(:,k)) <= import_price(:,index)'*import(:,k)):'NEM credits < Import Cost'];
+        %%%NEM (+wholesale) Credits to be less than Import Cost
+
+        %Constraints = [Constraints
+            %(export_price(:,index)'*(rees_dchrg_nem(:,k)+pv_nem(:,k)) <= import_price(:,index)'*import(:,k)):'NEM credits < Import Cost'];
         
+        %Constraints = [Constraints
+            %(sum(ex_wholesale*pv_wholesale(:,k)) <= 2*import_price(:,index)'*import(:,k)):'NEM credits < Import Cost'];
+
+         Constraints = [Constraints
+            (export_price(:,index)'*(rees_dchrg_nem(:,k)+pv_nem(:,k)) + (sum(ex_wholesale*pv_wholesale(:,k)))<= import_price(:,index)'*import(:,k)):'NEM credits < Import Cost'];
+
         if net_import_on == 1
         %%% Export to be always greater than a percentage of import. Export >= zne*import
         %%% zne = 1 for full ZNE.

@@ -229,6 +229,16 @@ end
 
 resc
 
+k=2
+%SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)',active(:,k,1),active(:,k,2),active(:,k,3),active(:,k,4),active(:,k,5),'VariableNames',{'Qind','Qcap','Volts','R1','R2','R3','R4','R5'})
+
+%SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)',active(:,k,1),active(:,k,2),active(:,k,3),'VariableNames',{'Qind','Qcap','Volts','R1','R2','R3'})
+
+SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)','VariableNames',{'Qind','Qcap','Volts'})
+
+SI = table(Qanc(:,k),Volts(T_map(k),:)','VariableNames',{'Qanc','Volts'})
+
+
 %% Check PV Curtailment
 
 %max(pv_curtail(:,10:19)) %check if residential is curtailing

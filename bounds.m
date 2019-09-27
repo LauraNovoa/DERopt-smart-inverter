@@ -5,12 +5,13 @@
             (0 <= onpeak_dc):'0 <= onpeak_dc'
             (0 <= midpeak_dc):'0  midpeak_dc'
             (0 <= import):'0 import'
-            (0 <= inv_adopt <= 99999):'0 <= inv_adop <= 99999'
+            (0 <= inv_adopt <= 5000):'0 <= inv_adop <= 5000'
             (0 <= Qelec):'0 <= Qelec'
             (0 <= Qimport):'0 <= Qimport'
-            (0 <= Qind <= 99999):'0 <= Qind <= 99999'
-            (0 <= Qcap <= 99999):'0<= Qcap <= 99999'
-            (0 <= Volts <= 2.0):'0<= Volts <= 2 p.u.'
+            (-99999 <= Qanc <= 99999):'0 <= Qanc <= 99999'
+            %(0 <= Qind <= 99999):'0 <= Qind <= 99999'
+            %(0 <= Qcap <= 99999):'0<= Qcap <= 99999'
+            (0.5 <= Volts <= 2.0):'0.5 <= Volts <= 2 p.u.'
             (-99999 <= Pinv <= 99999):'-99999 <= Pinv <= 99999 Big M'
             ];
         

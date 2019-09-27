@@ -20,13 +20,13 @@ pallete = bright;
     end 
 
     
- k=2; %Choose building #
+ k=11; %Choose building #
  s=t/50; %spacing for x axis
  tlim1 = 0;
  tlim2 = 24; % Limit for x-axis (for all plots)
 
- legon = 0;
- leglocation = 'northoutside'
+ legon = 1;
+ leglocation = 'best';
  alpha = 1; %08 for ransparent legend 
  
 %%  Inverter dynamics
@@ -45,9 +45,10 @@ pallete = bright;
     h2 = plot(1:t,Qinv(:,k),'Color',[pallete(3,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','d');
     h3 = plot(1:t,Sinv(:,k),'Color',[pallete(10,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','*');
     h4 = plot(1:t,Qelec(:,k),'Color',[pallete(4,:) 1],'LineStyle','--','LineWidth',1.5,'Marker','none');
-    %h4 = plot(1:t,Qanc(:,k),'Color',[pallete(5,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','+');
-    h5 = plot(1:t,Qind(:,k),'Color',[pallete(5,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
-    h6 = plot(1:t,-Qcap(:,k),'Color',[pallete(1,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
+    %h5 = plot(1:t,Qind(:,k),'Color',[pallete(5,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
+    %h6 = plot(1:t,-Qcap(:,k),'Color',[pallete(1,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
+    h5 = bar(1:t,Qind(:,k),'FaceColor',[pallete(5,:)]);
+    h6 = bar(1:t,Qcap(:,k),'FaceColor',[pallete(1,:)]);
     h7 = plot(1:t,Qimport(:,k),'Color',[pallete(9,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
     h8 = plot(1:t,-(pv_wholesale(:,k) + pv_elec(:,k) + ees_chrg_pv(:,k) + pv_nem(:,k) + rees_chrg(:,k)),'Color',[pallete(6,:) 1],'LineStyle','-','LineWidth',1.0);
     h9 = plot(1:t,-(ees_dchrg(:,k) + rees_dchrg(:,k) + rees_dchrg_nem(:,k)),'Color',[pallete(7,:) 1],'LineStyle','-','LineWidth',1.0);

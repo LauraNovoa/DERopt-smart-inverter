@@ -3,8 +3,8 @@ clear all; close all; clc ; started_at = datetime('now'); startsim = tic;
 
 %% Optimization Solver
 %%% Choose solver 
-opt_cplex = 1; %CPLEX, will do a model export YALMIP -> CPLEX
-opt_yalmip = 0; %YALMIP,calling CPLEX MILP solver
+opt_cplex = 0; %CPLEX, will do a model export YALMIP -> CPLEX
+opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
 
 %% Optimization Parameters
 
@@ -19,12 +19,12 @@ opt_t = 0;                 % On/Off optimize transformer size (T_rated)
 ic = 1;                    % On/Off inverter polygon constraints
 invertermode = 3;          % (1) Standard (2) Optimal PQ, (3) Smart-Inveter with droop-control
 nem_c = 1;                 % On/Off NEM constraints 
-zne = 1;                   % 1 = 100% ZNE ! (At the building level)
+zne = 0.4;                 % 1 = 100% ZNE ! (At the building level)
 dlpfc = 0;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
 lindist = 1;               % On/Off LinDistFlow constraints 
 socc = 0;                  % On/Off SOC constraints
-voltage = 1;               % Use upped and lower limit for voltage 
-VL = 0.90;                 % High Voltage Limit(p.u.)
+voltage = 0;               % Use upped and lower limit for voltage 
+VL = 0.9;                  % High Voltage Limit(p.u.)
 VH = 1.1;                  % Low Voltage Limit (p.u.)
 branchC = 0;               % On/Off Banch kVA constraints
 primonly = 0;              % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
@@ -68,7 +68,10 @@ Rmulti = 1;      % Multiplier for resistance in impedance matrix
 mpc.branch(:,3) = Rmulti.*mpc.branch(:,3);
 
 %T_map = [65 76	84	82	78	74	72	84	70	4	12	7	15	10	39	44	19	47	34	67	59	53	61	30	80	22	57	27	63	51	24];%Apr.10.19 %84-node
-T_map = [106	111	115	114	112	110	109	101	108	85	88	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
+%T_map = [106	111	115	114	112	110	109	101	108	85	88	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
+
+%Relaxing Solteros
+T_map = [106	111	115	114	112	110	109	101	108	85	11	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
 
 load Sb_rated_86; Sb_rated = Sb_rated_86; %MVA %84-node / 115-node
 
@@ -151,28 +154,28 @@ elec_vecs
 
 %% DERopt
 %% Setting up variables and Objective function
-fprintf('%s: Objective Function.', datestr(now,'HH:MM:SS'))
+fprintf('%s: Objective Function...', datestr(now,'HH:MM:SS'))
 tic
 opt_var_cf 
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
 %% General Equality Constraints
-fprintf('%s: General Equalities.', datestr(now,'HH:MM:SS'))
+fprintf('%s: General Equalities...', datestr(now,'HH:MM:SS'))
 tic
 opt_gen_equalities
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
 %% General Inequality Constraints
-fprintf('%s: General Inequalities. ', datestr(now,'HH:MM:SS'))
+fprintf('%s: General Inequalities...', datestr(now,'HH:MM:SS'))
 tic
 opt_gen_inequalities
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
 %% Solar PV Constraints
-fprintf('%s: PV Constraints.', datestr(now,'HH:MM:SS'))
+fprintf('%s: PV Constraints...', datestr(now,'HH:MM:SS'))
 tic
 opt_pv
 %opt_pv_2 
@@ -180,29 +183,29 @@ elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
 %% EES Constraints
-fprintf('%s: EES Constraints.', datestr(now,'HH:MM:SS'))
+fprintf('%s: EES Constraints...', datestr(now,'HH:MM:SS'))
 tic
 opt_ees
 elapsed = toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
 %% Inverter Constraints
-fprintf('%s: Inverter Constraints.', datestr(now,'HH:MM:SS'))
+fprintf('%s: Inverter Constraints...', datestr(now,'HH:MM:SS'))
 ttime = tic;
-opt_inverter % Opt PQ with Qelec
+opt_inverter_3 % Opt PQ with Qelec
 elapsed = toc(ttime);
 fprintf('Took %.2f seconds \n', elapsed)
 %% Transformer Constraints
-fprintf('%s: Transformer Constraints.', datestr(now,'HH:MM:SS'))
+fprintf('%s: Transformer Constraints...', datestr(now,'HH:MM:SS'))
 ttime = tic;
-opt_transformer %AEC 31 bldg
+opt_transformer_3 %AEC 31 bldg
 %opt_transformer_mpc % IEEE-33 node case 
 elapsed = toc(ttime);
 fprintf('Took %.2f seconds \n', elapsed)
 
 %% DLPF
 if dlpfc == 1
-    fprintf('%s: DLPF.', datestr(now,'HH:MM:SS'))
+    fprintf('%s: DLPF...', datestr(now,'HH:MM:SS'))
     tic
     opt_DLPF
     elapsed = toc;
@@ -210,7 +213,7 @@ if dlpfc == 1
 end 
 %% LinDistFlow 
 if lindist == 1  
-    fprintf('%s: LinDist.', datestr(now,'HH:MM:SS'))
+    fprintf('%s: LinDist...', datestr(now,'HH:MM:SS'))
     tic
     opt_LinDistFlow
     elapsed = toc;
@@ -219,21 +222,20 @@ end
 
 %% Smart Inverter
 if invertermode == 3
-    fprintf('%s: Smart Inverter.', datestr(now,'HH:MM:SS'))
+    fprintf('%s: Smart Inverter...', datestr(now,'HH:MM:SS'))
     tic
-    opt_smart_inverter
+    opt_smart_inverter_4
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
 end 
 %% NEM Constraints
-fprintf('%s: NEM Constraints.', datestr(now,'HH:MM:SS'))
+fprintf('%s: NEM Constraints...', datestr(now,'HH:MM:SS'))
 tic
 opt_nem
 elapsed=toc;
 fprintf('Took %.2f seconds \n', elapsed)
 
-%% Optimize
-fprintf('%s: Optimizing \n....', datestr(now,'HH:MM:SS'))
+%% Optimize!
 bounds
 opt
 
