@@ -4,9 +4,9 @@
 %(2) Optimal: Curtails PV on AC side. Qelec, Qind, and Qcap optimal output (without droop-control)
 %(3) Smart-Inverter: Curtails PV on AC side. Qind, and Qcap droop-control output, Qelec = 0 ( does not meet building Q load)
 
-inv_adopt = sdpvar(1,K,'full'); %Optimize inverter size
+inv_adopt = sdpvar(1,K,'full'); %Inverter size
 
-Objective = Objective + inv_v*M*sum(inv_adopt); %Add inverter cost to objective function
+%Objective = Objective + inv_v*M*sum(inv_adopt); %Add inverter cost to objective function
 
 %% Pinv, Qinv, and Polygon Constraints 
 Pinv = sdpvar(T,K,'full'); %kW

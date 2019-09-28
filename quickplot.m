@@ -4,7 +4,6 @@
 % (2) transformer 
 % (3) building  
 
-close all 
 %% Color Palletes
 load('palletes_ldn');
 pallete = bright;
@@ -20,7 +19,7 @@ pallete = bright;
     end 
 
     
- k=11; %Choose building #
+ k=2; %Choose building #
  s=t/50; %spacing for x axis
  tlim1 = 0;
  tlim2 = 24; % Limit for x-axis (for all plots)

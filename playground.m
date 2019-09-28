@@ -19,11 +19,11 @@ opt_t = 0;                 % On/Off optimize transformer size (T_rated)
 ic = 1;                    % On/Off inverter polygon constraints
 invertermode = 3;          % (1) Standard (2) Optimal PQ, (3) Smart-Inveter with droop-control
 nem_c = 1;                 % On/Off NEM constraints 
-zne = 0.4;                 % 1 = 100% ZNE ! (At the building level)
-dlpfc = 0;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
-lindist = 1;               % On/Off LinDistFlow constraints 
+zne = 1;                   % 1 = 100% ZNE ! (At the building level)
+dlpfc = 1;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
+lindist = 0;               % On/Off LinDistFlow constraints 
 socc = 0;                  % On/Off SOC constraints
-voltage = 0;               % Use upped and lower limit for voltage 
+voltage = 1;               % Use upped and lower limit for voltage 
 VL = 0.9;                  % High Voltage Limit(p.u.)
 VH = 1.1;                  % Low Voltage Limit (p.u.)
 branchC = 0;               % On/Off Banch kVA constraints

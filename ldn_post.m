@@ -229,15 +229,36 @@ end
 
 resc
 
-k=2
+
 %SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)',active(:,k,1),active(:,k,2),active(:,k,3),active(:,k,4),active(:,k,5),'VariableNames',{'Qind','Qcap','Volts','R1','R2','R3','R4','R5'})
 
 %SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)',active(:,k,1),active(:,k,2),active(:,k,3),'VariableNames',{'Qind','Qcap','Volts','R1','R2','R3'})
 
-SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)','VariableNames',{'Qind','Qcap','Volts'})
+%SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)','VariableNames',{'Qind','Qcap','Volts'})
 
+k=1
 SI = table(Qanc(:,k),Volts(T_map(k),:)','VariableNames',{'Qanc','Volts'})
 
+xx = Volts(T_map,:)';
+yy = Qanc;
+figure
+for k = 1:2
+scatter(xx(:,k),yy(:,k))
+hold on;
+end
+xlabel('Volts')
+ylabel('Qanc')
+
+figure
+plot(Volts)
+figure
+plot(Qanc(:,[1 2]))
+
+if exist('slackp') 
+    slackp = value(slackp)
+    slackn = value(slackn)
+end
+    
 
 %% Check PV Curtailment
 

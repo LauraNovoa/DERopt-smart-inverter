@@ -13,16 +13,21 @@ if VV
 mcap = (VV_Q2 - VV_Q1)/(VV_V2 - VV_V1);
 mind = (VV_Q4 - VV_Q3)/(VV_V4 - VV_V3);
               
-%This grid kaes a long time
+%This grid takes a long time
 %xi = VV_V1:0.01:VV_V4;
 %yi = 0:150:2000;   
     
 %xi = VV_V1:0.05:VV_V4;
 %yi = 0:200:1000;   
     
-%xi = [linspace(VV_V1-0.1,VV_V2,50) 1 linspace(VV_V3,VV_V4+0.1,50)];
-xi = linspace(VV_V1-0.1,VV_V4+0.1,60);
-yi = linspace(0,1000,6);   
+%xi = linspace(VV_V1-0.1,VV_V4+0.1,60); % this works but precision is not good
+
+% xi = [linspace(VV_V1-0.1,VV_V2-.001,20) linspace(VV_V2,VV_V3,20) linspace(VV_V3+.001,VV_V4+0.1,50)];
+% yi = linspace(0,1000,6);
+
+%Coarse mesh
+xi = [linspace(VV_V1-0.1,VV_V2-.001,2) linspace(VV_V2,VV_V3,2) linspace(VV_V3+.001,VV_V4+0.1,2)];
+yi = linspace(0,4000,3);
 
 [X,Y] = meshgrid (xi,yi); 
 
@@ -48,31 +53,41 @@ yi = linspace(0,1000,6);
   ylabel('inv_adopt(y)')
   zlabel('Qanc(Z)')     
   
-   %slackp = sdpvar(T,K,'full');
-   %slackn = sdpvar(T,K,'full');
+%   slackp = sdpvar(T,K,'full');
+%   slackn = sdpvar(T,K,'full');
+ 
+%Choose bldgs to have Smart Inverters
+bldg = [1 2 6 10 12 17 19 22 29 ];
   
-%Changed K to 2 
-for k=1:2
+for k=1:length(bldg) % will only add constraints to the buildings listed in 'bldg' vector
    for t=1:T
     
-   qanc = interp2(X,Y,Z',Volts(T_map(k),t),inv_adopt(k),'milp');
-   %active = binvar(T,K,2); %There are 2 regions : deadband or no deadband
-            
+   qanc = interp2(X,Y,Z',Volts(T_map(bldg(k)),t),inv_adopt(bldg(k)),'milp');
+          
    Constraints = [ Constraints
        %(Qanc(t,k) == -1*qanc + slackp(t,k) - slackn(t,k)):sprintf('Qanc = qanc(interp2) t=%d, k=%d',t,k)
-       (Qanc(t,k) == -1*qanc):sprintf('Qanc = qanc(interp2) t=%d, k=%d',t,k)
-       %(implies( VV_V2 <= Volts(T_map(k),t), Qanc(t,k) == 0 )):['implies VV deadband,t=', num2str(t),', k=', num2str(k)];
-       %(implies( Volts(T_map(k),t) <= VV_V3, Qanc(t,k) == 0 )):['implies VV deadband,t=', num2str(t),', k=', num2str(k)];
-       %0 <= slackp 
-       %0 <= slackn 
+       (Qanc(t,bldg(k)) == -1*qanc):sprintf('Qanc = qanc(interp2) t=%d, k=%d',t,bldg(k))
        ];  
-   
-      %(implies(active(t,k,2), [ VV_V2 <= Volts(T_map(k),t) <= VV_V3, Qanc(t,k) == 0 ])):['implies VV 4,t=', num2str(t),', k=', num2str(k)];
-      %(sum(active,3) == 1):'VV binary active sum = 1 ' 
-             
+              
    end
 end
 
+%  Constraints = [ Constraints
+%        (0 <= slackp ):'slackp >=0'
+%        (0 <= slackn ):'slackn >=0' 
+%        ];
+
+  % Objective = Objective + sum(sum(slackp)) + sum(sum(slackn));
+
 end
 
-%Objective = Objective + sum(sum(slackp)) + sum(sum(slackn));
+%% Keep voltage close to 1 p.u. 
+
+tt = sdpvar(N,T,'full');
+
+Objective = Objective + sum(sum(tt));
+
+Constraints = [Constraints
+    (tt >= (1-Volts)):'tt >= 1-Volts'
+    (tt >= -(1-Volts)):'tt >= -(1-Volts)'
+    ];
