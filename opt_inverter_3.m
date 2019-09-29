@@ -69,10 +69,17 @@ theta = pi/L + i.*(2*pi)./L; %rad
 C = [cos(theta)' sin(theta)'];
 s = inv_adopt*cos(theta(1));
 
+% slack_inv  = sdpvar(K,1,'full');
+% Objective = Objective + sum(slack_inv);
+% Constraints = [Constraints 
+%     0 <= slack_inv <= 1000];
+
 if ic % If Inv. constraints ON
     for k=1:K %for each bldg
     Constraints = [Constraints
         (C*[Pinv(:,k)';Qinv(:,k)'] <= s(k)):'Inv. Polygon Constraint'
+        %s(k) <= 2*C*[Pinv(:,k)';Qinv(:,k)']
+        %(C*[Pinv(:,k)';Qinv(:,k)']  ==  slack_inv(k) + s(k)):'Inv. Polygon Constraint'
         (inv_adopt(k)>= Pinv_in(:,k)):'Inv. P IN Limit'
         (inv_adopt(k)>= Pinv_out(:,k)):'Inv. P OUT Limit'
         %(inv_adopt(k)>= Qinv_in(:,k)):'Inv. Q IN limit'

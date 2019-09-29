@@ -5,7 +5,8 @@
             (0 <= onpeak_dc):'0 <= onpeak_dc'
             (0 <= midpeak_dc):'0  midpeak_dc'
             (0 <= import):'0 import'
-            (0 <= inv_adopt <= 5000):'0 <= inv_adop <= 5000'
+            %(0 <= inv_adopt <= 5000):'0 <= inv_adop <= 5000'
+            (0 <= inv_adopt <= 2500):'0 <= inv_adop <= 5000'
             (0 <= Qelec):'0 <= Qelec'
             (0 <= Qimport):'0 <= Qimport'
             (-99999 <= Qanc <= 99999):'0 <= Qanc <= 99999'
@@ -13,6 +14,7 @@
             %(0 <= Qcap <= 99999):'0<= Qcap <= 99999'
             (0.5 <= Volts <= 2.0):'0.5 <= Volts <= 2 p.u.'
             (-99999 <= Pinv <= 99999):'-99999 <= Pinv <= 99999 Big M'
+            (-99999 <= Qinv <= 99999):'-99999 <= Qinv <= 99999 Big M'
             ];
         
   if isempty(pv_v) ==0
@@ -20,7 +22,8 @@
             (0 <= pv_elec):'0 <= pv_elec'
             (0 <= pv_nem):'0 <= pv_nem'
             (0 <= pv_wholesale):'0 <= pv_wholesale'
-            (0 <= pv_adopt <= 99999):'0 <= pv_adopt <= 99999 Big M' %Big M limits
+            %(0 <= pv_adopt <= 99999):'0 <= pv_adopt <= 99999 Big M' %Big M limits
+            (0 <= pv_adopt <= 2000):'0 <= pv_adopt <= 99999 Big M' %Big M limits
  %           3 <= pv_adopt <= 99999 % Limits for semivar
             ];
   end

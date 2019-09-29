@@ -26,8 +26,12 @@ mind = (VV_Q4 - VV_Q3)/(VV_V4 - VV_V3);
 % yi = linspace(0,1000,6);
 
 %Coarse mesh
-xi = [linspace(VV_V1-0.1,VV_V2-.001,2) linspace(VV_V2,VV_V3,2) linspace(VV_V3+.001,VV_V4+0.1,2)];
-yi = linspace(0,4000,3);
+% xi = [linspace(VV_V1-0.1,VV_V2-.001,2) linspace(VV_V2,VV_V3,2) linspace(VV_V3+.001,VV_V4+0.1,2)];
+% yi = linspace(0,4000,3);
+
+%SI points mesh
+xi = [VV_V1-0.1 VV_V1 VV_V2 VV_V3 VV_V4 VV_V4+0.1]
+yi = linspace(0,2500,2)
 
 [X,Y] = meshgrid (xi,yi); 
 
@@ -53,11 +57,14 @@ yi = linspace(0,4000,3);
   ylabel('inv_adopt(y)')
   zlabel('Qanc(Z)')     
   
-%   slackp = sdpvar(T,K,'full');
-%   slackn = sdpvar(T,K,'full');
+%slackp = sdpvar(T,K,'full');
+%slackn = sdpvar(T,K,'full');
  
 %Choose bldgs to have Smart Inverters
-bldg = [1 2 6 10 12 17 19 22 29 ];
+%bldg = [1 2];
+%bldg = [1 2 10 12 22]
+bldg = [1 5 6 10 12]
+%bldg = [1 2 4 6 10 12 15 17 19 22 23 25 29 30 31];
   
 for k=1:length(bldg) % will only add constraints to the buildings listed in 'bldg' vector
    for t=1:T
@@ -77,7 +84,7 @@ end
 %        (0 <= slackn ):'slackn >=0' 
 %        ];
 
-  % Objective = Objective + sum(sum(slackp)) + sum(sum(slackn));
+% Objective = Objective + sum(sum(slackp)) + sum(sum(slackn));
 
 end
 
@@ -91,3 +98,30 @@ Constraints = [Constraints
     (tt >= (1-Volts)):'tt >= 1-Volts'
     (tt >= -(1-Volts)):'tt >= -(1-Volts)'
     ];
+
+%% Keep inv_adopt close to polygon limit
+
+% ii = sdpvar(K,T,'full');
+% 
+% Objective = Objective + sum(sum(ii));
+% 
+% for k=1:K %for each bldg
+% Constraints = [Constraints
+%     (ii(k) >= (s(k) - C*[Pinv(:,k)';Qinv(:,k)'])):'ii >= s - (...)' 
+%     (ii(k) >= -(s(k) - C*[Pinv(:,k)';Qinv(:,k)'])):'ii >= s - (...)'
+%     ];
+% end
+
+%% Penalty for oversizing inverter 
+
+% ii = sdpvar(T,K,'full');
+% 
+% for t=1:T
+%     for k=1:K %for each bldg
+%         Objective = Objective + sum(sum(ii(t,k)));
+%         Constraints = [Constraints 
+%             ii(t,k) >=  (s(k) - C*[Pinv(t,k)';Qinv(t,k)])'ii >= s - (...)' 
+%             ii(t,k) >= -(s(k) - C*[Pinv(t,k)';Qinv(t,k)])'ii >= - (s - (...))' 
+%             ];
+%     end
+% end 

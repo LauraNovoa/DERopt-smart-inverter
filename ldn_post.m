@@ -237,7 +237,7 @@ resc
 %SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)','VariableNames',{'Qind','Qcap','Volts'})
 
 k=1
-SI = table(Qanc(:,k),Volts(T_map(k),:)','VariableNames',{'Qanc','Volts'})
+SI = table(Pinv(:,k),Sinv(:,k),Qanc(:,k),Volts(T_map(k),:)','VariableNames',{'Pinv','Sinv','Qanc','Volts'})
 
 xx = Volts(T_map,:)';
 yy = Qanc;
