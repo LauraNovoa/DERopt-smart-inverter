@@ -1,4 +1,29 @@
 
+%% Optimize thru YALMIP
+if opt_yalmip  
+   
+    %Provide x0
+    %[model,recoverymodel,diagnostic,internalmodel] = export(Constraints,Objective,sdpsettings('solver','cplex'));
+    %load('x0')
+    %assign(recover(recoverymodel.used_variables),x0)
+    %ops = sdpsettings('solver','cplex','debug',1,'verbose',3,'warning',1,'savesolveroutput',1,'usex0',1);
+    
+    % No x0
+    ops = sdpsettings('solver','cplex','debug',1,'verbose',3,'warning',1,'savesolveroutput',1);
+    
+    ops.showprogress=1;
+    ops.cplex.mip.tolerances.mipgap = 0.004;
+    ops.cplex.mip.limits.nodes = 10000;
+    ops.cplex.mip.strategy.heuristicfreq = 1;
+    %ops.cplex.mip.strategy.probe = 3;
+    
+    %Optimize!
+    %sol = optimize(Constraints,Objective)    %Let YALMIP chose solver
+    sol = optimize(Constraints,Objective,ops) %Optimize with CPLEX and options above
+    %sol = optimize(Constraints,[],ops)       %Remove objective function to debug unfeasible problems 
+end
+
+
 %% Optimize thru CPLEX
 if opt_cplex
 
@@ -61,28 +86,4 @@ if opt_cplex
     
     % Recovering data and assigning to the YALMIP variables
     assign(recover(recoverymodel.used_variables),x)
-end
-
-%% Optimize thru YALMIP
-if opt_yalmip  
-   
-    %Provide x0
-    %[model,recoverymodel,diagnostic,internalmodel] = export(Constraints,Objective,sdpsettings('solver','cplex'));
-    %load('x0')
-    %assign(recover(recoverymodel.used_variables),x0)
-    %ops = sdpsettings('solver','cplex','debug',1,'verbose',3,'warning',1,'savesolveroutput',1,'usex0',1);
-    
-    % No x0
-    ops = sdpsettings('solver','cplex','debug',1,'verbose',3,'warning',1,'savesolveroutput',1);
-    
-    ops.showprogress=1;
-    ops.cplex.mip.tolerances.mipgap = 0.004;
-    ops.cplex.mip.limits.nodes = 10000;
-    ops.cplex.mip.strategy.heuristicfreq = 1;
-    %ops.cplex.mip.strategy.probe = 3;
-    
-    %Optimize!
-    %sol = optimize(Constraints,Objective)    %Let YALMIP chose solver
-    sol = optimize(Constraints,Objective,ops) %Optimize with CPLEX and options above
-    %sol = optimize(Constraints,[],ops)       %Remove objective function to debug unfeasible problems 
 end

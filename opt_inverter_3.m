@@ -46,9 +46,10 @@ if invertermode == 1 %Standard inverter
         (Qelec == 0):'Qelec = 0'
         (Qanc == 0):'Qanc = 0'
         %(Qind == 0):'Qind = 0'
-        %(Qcap == 0):'Qcap = 0'
+        %(Qcap == 0):'Qcap = 0      
     ];
 
+        bldg = []
     
 elseif invertermode ==3 %Smart-Inverter with droop-control
     
@@ -59,7 +60,6 @@ elseif invertermode ==3 %Smart-Inverter with droop-control
         %(Pinv_out <= pv_elec + pv_nem + pv_wholesale + ees_dchrg + rees_dchrg + rees_dchrg_nem):'Pinv_out (Smart Inverter)'       
         (Qelec == 0):'Qelec = 0'
         ];
-
 end
 
 %Inverter Polygon Constraints

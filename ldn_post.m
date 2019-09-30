@@ -102,7 +102,7 @@ TranformerResults = table(max(TloadkVA(:,T_map))',max(TloadkVAR(:,T_map))', T_PV
 
 %InverterResults = table(inv_adopt', max(Sinv)', max(abs(Pinv))', max(abs(Qinv))', max(Qelec)',max(abs(Qanc))', max(Qimport)','VariableNames', {'Inv_kVA','Max_Sinv','Max_Pinv','Max_Qinv','Max_Qelec','Max_ABs_Qanc','Max_Qimport'})
 
-InverterResults = table(inv_adopt', max(Sinv)', max(abs(Pinv))', max(abs(Qinv))', max(Qelec)',max(Qind)',max(Qcap)', max(Qimport)','VariableNames', {'Inv_kVA','Max_Sinv','Max_Pinv','Max_ABS_Qinv','Max_Qelec','Max_Qind','Max_Qcap','Max_Qimport'})
+InverterResults = table(inv_adopt', max(Sinv)', max(abs(Pinv))', max(abs(Qinv))', max(Qelec)',max(Qind)',min(Qcap)', max(Qimport)','VariableNames', {'Inv_kVA','Max_Sinv','Max_Pinv','Max_ABS_Qinv','Max_Qelec','Max_Qind','Max_Qcap','Max_Qimport'})
 
 %Adoptions, Elecload, Tchec
 BLDGResultskW = table(pv_adopt',ees_adopt',rees_adopt', max(elec)',min(elec)', 'VariableNames' , {'pv_adopt_kW','ees_adopt_kWh','rees_adopt_kWh' 'Max_elec_load_kW', 'Min_elec_load_kW'})
@@ -236,8 +236,10 @@ resc
 
 %SI = table(Qind(:,k),Qcap(:,k),Volts(T_map(k),:)','VariableNames',{'Qind','Qcap','Volts'})
 
-k=1
-SI = table(Pinv(:,k),Sinv(:,k),Qanc(:,k),Volts(T_map(k),:)','VariableNames',{'Pinv','Sinv','Qanc','Volts'})
+for k=1:length(bldg)
+bldg(k)
+SI = table(Pinv(:,bldg(k)),Sinv(:,bldg(k)),Qanc(:,bldg(k)),Volts(T_map(bldg(k)),:)','VariableNames',{'Pinv','Sinv','Qanc','Volts'})
+end 
 
 xx = Volts(T_map,:)';
 yy = Qanc;

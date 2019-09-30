@@ -94,11 +94,12 @@ if isempty(pv_v) == 0
             + pv_v(1)*M*sum(pv_adopt)... %%%Capital Cost ($/kW installed)
             + pv_v(3)*( sum(sum(repmat(day_multi,1,K).*(pv_elec + ees_chrg_pv + pv_nem + pv_wholesale))) ); %%%PV O&M Cost ($/kWh generated)    
             %+ 23.47*sum(pv_adopt)        %%%Fixed O&M cost ($/kW installed)
+
 %% Renewable Electrical Energy Storage REES 
 if isempty(ees_v) == 0 && rees_exist == 1
 
     %%%Adopted REES Size
-    rees_adopt= sdpvar(1,K,'full');
+    rees_adopt = sdpvar(1,K,'full');
     %rees_adopt= semivar(1,K,'full');
     %%%REES Charging from PV
     rees_chrg=sdpvar(T,K,'full');
@@ -132,6 +133,7 @@ if island == 0 % If not islanded, AEC can export NEM and wholesale for revenue
 end 
     
 else
+  
     rees_adopt=zeros(1,K);
     rees_chrg=zeros(T,K);
     rees_dchrg=zeros(T,K);

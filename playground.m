@@ -9,6 +9,7 @@ opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
 %% Optimization Parameters
 
 %% Quick Constraints
+force = 1;                 %Force baseline PV adoption 
 nopv = 0;                  % Turn off all PV
 noees = 0;                 % Turn off all EES/REES
 toolittle_pv = 0;          % min size for PV adoption = 3 kW
@@ -24,8 +25,8 @@ dlpfc = 1;                 % On/Off Decoupled Linearized Power Flow (DLPF) const
 lindist = 0;               % On/Off LinDistFlow constraints 
 socc = 0;                  % On/Off SOC constraints
 voltage = 1;               % Use upped and lower limit for voltage 
-VL = 0.9;                  % High Voltage Limit(p.u.)
-VH = 1.1;                  % Low Voltage Limit (p.u.)
+VL = 0.90;                  % High Voltage Limit(p.u.)
+VH = 1.01;                 % Low Voltage Limit (p.u.)
 branchC = 0;               % On/Off Banch kVA constraints
 primonly = 0;              % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
 minpf = 0;                 % On/Off Min PF at the transfromer
@@ -33,9 +34,9 @@ VV = 1;                    % On/Off Volt-Var
 VW = 0;                    % On/Off Volt-Watt
 
 if dlpfc || lindist 
-    cnstrts = table(nopv,noees,tc,opt_t,ic,invertermode,nem_c, zne,dlpfc,lindist,voltage, VL,VH, branchC,primonly,toolittle_pv,toolittle_storage,pv_maxarea, minpf,opt_cplex,opt_yalmip, 'VariableNames',{'nopv','noees','tc','opt_t','ic','invmode','nem_c','ZNE','dlpf','lindist','V','Vlow','Vhigh','Branch','primonly','MinPV','MinEES','MaxPVarea','minpf','CPLEX','YALMIP'})
+    cnstrts = table(nopv,noees,tc,opt_t,ic,invertermode,nem_c, zne,dlpfc,lindist,voltage, VL,VH, branchC,primonly,toolittle_pv,toolittle_storage,pv_maxarea, minpf,opt_cplex,opt_yalmip,force, 'VariableNames',{'nopv','noees','tc','opt_t','ic','invmode','nem_c','ZNE','dlpf','lindist','V','Vlow','Vhigh','Branch','primonly','MinPV','MinEES','MaxPVarea','minpf','CPLEX','YALMIP','force'})
 else 
-    cnstrts = table(nopv,noees,tc,opt_t,ic,invertermode,nem_c, zne,dlpfc,lindist,toolittle_pv,toolittle_storage,pv_maxarea,minpf,opt_cplex,opt_yalmip,'VariableNames',{'nopv','noees','tc','opt_t','ic','invmode','nem_c','ZNE','dlpf','lindist','MinPV','MinEES','MaxPVarea','minpf','CPLEX','YALMIP'})
+    cnstrts = table(nopv,noees,tc,opt_t,ic,invertermode,nem_c, zne,dlpfc,lindist,toolittle_pv,toolittle_storage,pv_maxarea,minpf,opt_cplex,opt_yalmip,force,'VariableNames',{'nopv','noees','tc','opt_t','ic','invmode','nem_c','ZNE','dlpf','lindist','MinPV','MinEES','MaxPVarea','minpf','CPLEX','YALMIP','force'})
 end 
 
 %% Load MATPOWER Test Case
@@ -68,10 +69,10 @@ Rmulti = 1;      % Multiplier for resistance in impedance matrix
 mpc.branch(:,3) = Rmulti.*mpc.branch(:,3);
 
 %T_map = [65 76	84	82	78	74	72	84	70	4	12	7	15	10	39	44	19	47	34	67	59	53	61	30	80	22	57	27	63	51	24];%Apr.10.19 %84-node
-%T_map = [106	111	115	114	112	110	109	101	108	85	88	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
+T_map = [106	111	115	114	112	110	109	101	108	85	88	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
 
 %Relaxing Solteros
-T_map = [106	111	115	114	112	110	109	101	108	85	11	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
+%T_map = [106	111	115	114	112	110	109	101	108	85	11	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
 
 load Sb_rated_86; Sb_rated = Sb_rated_86; %MVA %84-node / 115-node
 
@@ -269,8 +270,14 @@ title(sprintf('True AC Voltage range: %.3f - %.3f p.u.',min(min(BusVolAC)),max(m
 xlabel('Node')
 ylabel('Volts (p.u.)')
 
+% figure
+% plot(Volts)
+% title(sprintf('Linearized AC Voltage range: %.3f - %.3f p.u.',min(min(Volts)),max(max(Volts))))
+% xlabel('Node')
+% ylabel('Volts (p.u.)')
+
 figure
-plot(Volts)
+plot(Volts(:,2:end))
 title(sprintf('Linearized AC Voltage range: %.3f - %.3f p.u.',min(min(Volts)),max(max(Volts))))
 xlabel('Node')
 ylabel('Volts (p.u.)')

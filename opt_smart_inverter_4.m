@@ -60,13 +60,41 @@ yi = linspace(0,2500,2)
 %slackp = sdpvar(T,K,'full');
 %slackn = sdpvar(T,K,'full');
  
-%Choose bldgs to have Smart Inverters
+%% Choose bldgs to have Smart Inverters
+%Run this after Baseline
+%How many bldgs to have SIs
+% nsi = 7;
+% 
+% %Identifying nodes with worst over-voltage
+% [val row] = sort(max(Volts'),'descend');
+% row(1:nsi);
+% val(1:nsi);
+% 
+% %Build vector of which bldgs to place si
+% bldg = [];
+% for i=1:length(row(1:nsi))
+%     bldg = [bldg find(T_map==row(i))];
+% end 
+%% bldg vector
+
 %bldg = [1 2];
 %bldg = [1 2 10 12 22]
-bldg = [1 5 6 10 12]
+%bldg = [1 5 6 10 12] %Results are kind of the smae as 5bldg above
 %bldg = [1 2 4 6 10 12 15 17 19 22 23 25 29 30 31];
-  
-for k=1:length(bldg) % will only add constraints to the buildings listed in 'bldg' vector
+%bldg = [1 2 4 12 17 22 25 29 30 31];     
+% bldg = [
+%       find(T_map==88) 
+%       find(T_map==90) 
+%       find(T_map==95) 
+%       find(T_map==97) 
+%       find(T_map==106) 
+%       find(T_map==110)
+%       find(T_map==112)
+%       ];
+
+bldg = [11    14     1    17    12    10    16];
+
+for k=1:length(bldg) % only add constraints to the buildings listed in 'bldg' vector
    for t=1:T
     
    qanc = interp2(X,Y,Z',Volts(T_map(bldg(k)),t),inv_adopt(bldg(k)),'milp');
@@ -77,6 +105,16 @@ for k=1:length(bldg) % will only add constraints to the buildings listed in 'bld
        ];  
               
    end
+end
+
+%rest of buildings that do not have smart inverters 
+restbldg = (1:1:K); restbldg(bldg) = [];
+
+for k=1:length(restbldg) %make those not output any Qanc and do not cutail
+    Constraints = [Constraints
+            (Qanc(:,restbldg(k)) == 0):'Qanc = 0'
+            (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'Do not curtail fo std inv'
+            ];
 end
 
 %  Constraints = [ Constraints

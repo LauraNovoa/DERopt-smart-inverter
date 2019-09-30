@@ -15,6 +15,9 @@ load bldgdata\mdl_loads
 %Baseload community loads (bldg with weighting factors)
 elec = [comm.base.ind comm.base.res comm.base.com];  
 
+%Reducing solteros load to half
+elec(:,11) = 0.5*elec(:,11);
+
 K = size(elec,2);
 T = size(elec,1);
 
