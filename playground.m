@@ -11,7 +11,7 @@ opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
 %% Quick Constraints
 force = 1;                 %Force baseline PV adoption 
 nopv = 0;                  % Turn off all PV
-noees = 0;                 % Turn off all EES/REES
+noees = 1;                 % Turn off all EES/REES
 toolittle_pv = 0;          % min size for PV adoption = 3 kW
 toolittle_storage = 0;     % min size for EES adoption = 13.5 kWh (Powerwall) 
 pv_maxarea = 0;            % limit area for PV adoption 
@@ -24,9 +24,9 @@ zne = 1;                   % 1 = 100% ZNE ! (At the building level)
 dlpfc = 1;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
 lindist = 0;               % On/Off LinDistFlow constraints 
 socc = 0;                  % On/Off SOC constraints
-voltage = 1;               % Use upped and lower limit for voltage 
-VL = 0.90;                  % High Voltage Limit(p.u.)
-VH = 1.01;                 % Low Voltage Limit (p.u.)
+voltage = 0;               % Use upped and lower limit for voltage 
+VL = 0.95;                  % High Voltage Limit(p.u.)
+VH = 1.05;                 % Low Voltage Limit (p.u.)
 branchC = 0;               % On/Off Banch kVA constraints
 primonly = 0;              % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
 minpf = 0;                 % On/Off Min PF at the transfromer
@@ -264,8 +264,14 @@ adopt
 
 quickplot 
 
+% figure
+% plot(BusVolAC)
+% title(sprintf('True AC Voltage range: %.3f - %.3f p.u.',min(min(BusVolAC)),max(max(BusVolAC))))
+% xlabel('Node')
+% ylabel('Volts (p.u.)')
+
 figure
-plot(BusVolAC)
+plot(BusVolAC(:,2:end))
 title(sprintf('True AC Voltage range: %.3f - %.3f p.u.',min(min(BusVolAC)),max(max(BusVolAC))))
 xlabel('Node')
 ylabel('Volts (p.u.)')

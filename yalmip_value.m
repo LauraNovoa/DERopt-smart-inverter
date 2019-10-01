@@ -20,26 +20,26 @@ if isempty(pv_v) == 0
 end
 
 %EES
-if isempty(ees_v) == 0
+%if isempty(ees_v) == 0
     ees_adopt = value(ees_adopt);
     ees_soc = value(ees_soc);
     ees_dchrg = value(ees_dchrg);
     ees_chrg = value(ees_chrg);
     ees_chrg_pv = value(ees_chrg_pv);
-else
-    ees_adopt=zeros(1,K);
-end
+%else
+    %ees_adopt=zeros(1,K);
+%end
 
 %REES
-if isempty(ees_v) == 0 & rees_exist == 1
+%if isempty(ees_v) == 0 & rees_exist == 1
     rees_adopt = value(rees_adopt);
     rees_soc = value(rees_soc);
     rees_dchrg = value(rees_dchrg);
     rees_dchrg_nem = value(rees_dchrg_nem);
     rees_chrg = value(rees_chrg);
-else
-    rees_adopt=zeros(1,K);
-end
+%else
+   % rees_adopt=zeros(1,K);
+%end
 
 %EES/REES revenue
 if island == 0 % If not an island 

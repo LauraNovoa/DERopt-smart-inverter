@@ -61,20 +61,25 @@ yi = linspace(0,2500,2)
 %slackn = sdpvar(T,K,'full');
  
 %% Choose bldgs to have Smart Inverters
-%Run this after Baseline
-%How many bldgs to have SIs
-% nsi = 7;
+% %Run this after Baseline
+% %How many bldgs to have SIs
+% nsi = 10;
 % 
 % %Identifying nodes with worst over-voltage
 % [val row] = sort(max(Volts'),'descend');
 % row(1:nsi);
 % val(1:nsi);
 % 
+%  [val row] = sort(max(BusVolAC'),'descend');
+%  row(1:nsi);
+%  val(1:nsi);
+% 
 % %Build vector of which bldgs to place si
 % bldg = [];
 % for i=1:length(row(1:nsi))
 %     bldg = [bldg find(T_map==row(i))];
 % end 
+% bldg
 %% bldg vector
 
 %bldg = [1 2];
@@ -92,7 +97,8 @@ yi = linspace(0,2500,2)
 %       find(T_map==112)
 %       ];
 
-bldg = [11    14     1    17    12    10    16];
+%bldg = [11    14     1    17    12    10    16];
+bldg = [ 11    14     1    17    12    10    16    13    19     6 ];
 
 for k=1:length(bldg) % only add constraints to the buildings listed in 'bldg' vector
    for t=1:T

@@ -1,22 +1,22 @@
 close all 
 %% Select plots 
-plot1 = 1; % AEC Dynamics for the entire year
-plot2 = 0; % AEC Dynamics for a given interval "dlength"
-plot1_1 = 0; %Building dynamics for the entire year
-plot2_1 = 0; %Building dynamics for dlength
-plot4 = 0; % AEC Dynamics subplots 
-plot5 = 0; % Transformer kVA limits subplot
-plot6 = 0; % Individual XFMR loading
-vpq = 0; % Voltage, Active and Reactive power comparison with ACPF MATPOWER
+plot1 = 1;            % AEC Dynamics for the entire year
+plot2 = 0;        	  % AEC Dynamics for a given interval "dlength"
+plot1_1 = 0;          % Building dynamics for the entire year
+plot2_1 = 0;          % Building dynamics for dlength
+plot4 = 0;            % AEC Dynamics subplots 
+plot5 = 0;            % Transformer kVA limits subplot
+plot6 = 0;            % Individual XFMR loading
+vpq = 1;              % Voltage, Active and Reactive power comparison with ACPF MATPOWER
 barinjections = 0;
 powererror =0 ;
 X_R = 0;
-sflowbranch = 0; % Sflow for individual branches
-sflowall = 0; % Sflow for all branches colored by ampacity
-plot10 = 0;% k-medeoids 
-plot11 = 0;%testing
-plot12 = 0;%Building Dynamics subplots
-socplot = 1;
+sflowbranch = 0;      % Sflow for individual branches
+sflowall = 0;         % Sflow for all branches colored by ampacity
+plot10 = 0;           % k-medeoids 
+plot11 = 0;           % testing
+plot12 = 0;           % Building Dynamics subplots
+socplot = 1;          % Battery SOC
 
 %% Plot constants 
 xp = 1:1:T;  
@@ -485,7 +485,7 @@ if vpq ==1
     n = size(mpc.bus,1);
     m = size(mpc.branch,1);
     s = 1; %spacing between xticks
-    ts = 250;
+    ts = 12;
     
     %Voltage Profile for all 864 timesteps
     fig = figure('Position', Position ,'PaperPositionMode','auto');

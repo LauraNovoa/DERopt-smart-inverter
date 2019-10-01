@@ -96,9 +96,8 @@ if isempty(pv_v) == 0
             %+ 23.47*sum(pv_adopt)        %%%Fixed O&M cost ($/kW installed)
 
 %% Renewable Electrical Energy Storage REES 
-if isempty(ees_v) == 0 && rees_exist == 1
 
-    %%%Adopted REES Size
+ %%%Adopted REES Size
     rees_adopt = sdpvar(1,K,'full');
     %rees_adopt= semivar(1,K,'full');
     %%%REES Charging from PV
@@ -109,6 +108,9 @@ if isempty(ees_v) == 0 && rees_exist == 1
     rees_dchrg_nem=sdpvar(T,K,'full');
     %%%REES SOC
     rees_soc=sdpvar(T,K,'full');
+
+if isempty(ees_v) == 0 && rees_exist == 1
+   
     %%%REES Cost
     Objective = Objective...
         + ees_v(1)*M*sum(rees_adopt)...%%%Capital Cost
@@ -133,12 +135,20 @@ if island == 0 % If not islanded, AEC can export NEM and wholesale for revenue
 end 
     
 else
-  
-    rees_adopt=zeros(1,K);
-    rees_chrg=zeros(T,K);
-    rees_dchrg=zeros(T,K);
-    rees_dchrg_nem=zeros(T,K);
-    rees_soc=zeros(T,K);    
+   
+    Constraints = [Constraints 
+        rees_adopt== 0
+        rees_chrg==0
+        rees_dchrg==0
+        rees_dchrg_nem==0
+        rees_soc==0
+        ];    
+    
+%     rees_adopt=zeros(1,K);
+%     rees_chrg=zeros(T,K);
+%     rees_dchrg=zeros(T,K);
+%     rees_dchrg_nem=zeros(T,K);
+%     rees_soc=zeros(T,K);    
 end        
                
 else
@@ -154,9 +164,8 @@ else
 end        
 
 %% Electrical Energy Storage EES
-if isempty(ees_v) == 0
-    
-    %%%Adopted EES Size
+
+%%%Adopted EES Size
     ees_adopt= sdpvar(1,K,'full');
     %ees_adopt = semivar(1,K,'full');
     %%%EES Charging from grid
@@ -166,6 +175,8 @@ if isempty(ees_v) == 0
     %%%EES SOC
     ees_soc=sdpvar(T,K,'full');
 
+if isempty(ees_v) == 0
+    
     %%%EES Cost 
     Objective = Objective...
         + ees_v(1)*M*sum(ees_adopt)...%%%Capital Cost
@@ -174,11 +185,20 @@ if isempty(ees_v) == 0
         %+ 91.8*sum(ees_adopt)         %%%Fixed O&M cost ($/kW installed)
     
 else
-    ees_adopt=zeros(1,K);
-    ees_soc=zeros(T,K);
-    ees_chrg=zeros(T,K);
-    ees_chrg_pv=zeros(T,K);
-    ees_dchrg=zeros(T,K);
+    
+     Constraints = [Constraints 
+        ees_adopt==0
+        ees_soc==0
+        ees_chrg==0
+        ees_chrg_pv==0
+        ees_dchrg==0
+        ];
+        
+%     ees_adopt=zeros(1,K);
+%     ees_soc=zeros(T,K);
+%     ees_chrg=zeros(T,K);
+%     ees_chrg_pv=zeros(T,K);
+%     ees_dchrg=zeros(T,K);
 end
     
     

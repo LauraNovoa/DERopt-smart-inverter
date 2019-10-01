@@ -43,7 +43,7 @@
             (0 <= ees_dchrg):'0 <= ees_dchrg'
             (0 <= ees_soc):'0 <= ees_soc'
             ];
-  end 
+ end 
         
   if opt_t
        Constraints=[Constraints
