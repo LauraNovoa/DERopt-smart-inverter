@@ -129,24 +129,24 @@ end
 BranchSFlowAC= sqrt(BranchPFlowAC.^2 + BranchQFlowAC.^2); % MVA
 
 %% ACPF V max min 
-[uvnodes, uvtimes] = min(BusVolAC,[],2);
+[uvnodes, uvtimes] = min(BusVolAC(:,2:end),[],2);
 [uv, nodeuv] = min(uvnodes);
 timeuv = uvtimes(nodeuv);
 datetimev(timeuv,:);
 
-[ovnodes, ovtimes] = max(BusVolAC,[],2);
+[ovnodes, ovtimes] = max(BusVolAC(:,2:end),[],2);
 [ov, nodeov] = max(ovnodes);
 timeov = ovtimes(nodeov);
 datetimev(timeov,:);
 
 %% Linearized V max min 
 if exist('Volts','var')
-[uvnodesL, uvtimesL] = min(Volts,[],2);
+[uvnodesL, uvtimesL] = min(Volts(:,2:end),[],2);
 [uvL, nodeuvL] = min(uvnodesL);
 timeuvL = uvtimesL(nodeuvL);
 datetimev(timeuvL,:);
 
-[ovnodesL, ovtimesL] = max(Volts,[],2);
+[ovnodesL, ovtimesL] = max(Volts(:,2:end),[],2);
 [ovL, nodeovL] = max(ovnodesL);
 timeovL = ovtimesL(nodeovL);
 datetimev(timeov,:);

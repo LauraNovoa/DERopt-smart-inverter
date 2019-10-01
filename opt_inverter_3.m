@@ -6,7 +6,9 @@
 
 inv_adopt = sdpvar(1,K,'full'); %Inverter size
 
-%Objective = Objective + inv_v*M*sum(inv_adopt); %Add inverter cost to objective function
+Objective = Objective + 10*inv_v*M*sum(inv_adopt); %Add inverter cost to objective function
+
+%Objective = Objective + sum(inv_adopt);
 
 %% Pinv, Qinv, and Polygon Constraints 
 Pinv = sdpvar(T,K,'full'); %kW
@@ -80,8 +82,8 @@ if ic % If Inv. constraints ON
         (C*[Pinv(:,k)';Qinv(:,k)'] <= s(k)):'Inv. Polygon Constraint'
         %s(k) <= 2*C*[Pinv(:,k)';Qinv(:,k)']
         %(C*[Pinv(:,k)';Qinv(:,k)']  ==  slack_inv(k) + s(k)):'Inv. Polygon Constraint'
-        (inv_adopt(k)>= Pinv_in(:,k)):'Inv. P IN Limit'
-        (inv_adopt(k)>= Pinv_out(:,k)):'Inv. P OUT Limit'
+        %(inv_adopt(k)>= Pinv_in(:,k)):'Inv. P IN Limit'
+        %(inv_adopt(k)>= Pinv_out(:,k)):'Inv. P OUT Limit'
         %(inv_adopt(k)>= Qinv_in(:,k)):'Inv. Q IN limit'
         %(inv_adopt(k)>= Qinv_out(:,k)):'Inv. Q OUT limit'
         ];
