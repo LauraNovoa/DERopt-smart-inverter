@@ -20,9 +20,9 @@ pallete = bright;
     end 
 
     
- k=1; %Choose building #
+ k=11; %Choose building #
  s=1; %spacing for x axis
- tlim1 = 0;
+ tlim1 = 1;
  tlim2 = 24; % Limit for x-axis (for all plots)
 
  legon = 0;
@@ -31,7 +31,7 @@ pallete = bright;
  
 %%  Inverter dynamics
 
-    Position = [467   -53   812   515];
+    Position = [ 541   303   607   427];
     fig = figure('Position', Position ,'PaperPositionMode','auto');
     fig.Color = 'w';
     ax = axes('Parent',fig,'XTick',1:s:t); % set xticklabel to '' to remove ticks

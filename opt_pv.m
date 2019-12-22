@@ -35,8 +35,14 @@ end
 %% Forcing Baseline PV 
 if force ==1
     if invertermode == 2 | invertermode == 3
-        load('PV_baseline')
-            Constraints = [Constraints, (pv_adopt == PV'):'Force Baseline PV adoption'];
+        load('PV1ZNE')
+        %load('PV2')
+        %load('PV3')
+            Constraints = [Constraints, (pv_adopt == PV1ZNE):'Force 1ZNE Baseline PV adoption'];
+            %Constraints = [Constraints, (pv_adopt == PV'):'Force Baseline PV adoption'];
+            %Constraints = [Constraints, (pv_adopt == PV2'):'Force 2ZNE Baseline PV adoption'];
+            %Constraints = [Constraints, (pv_adopt == PV3'):'Force 3ZNE Baseline PV adoption'];
+            
     end
 end 
 

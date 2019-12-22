@@ -6,7 +6,7 @@
 
 inv_adopt = sdpvar(1,K,'full'); %Inverter size
 
-Objective = Objective + 10*inv_v*M*sum(inv_adopt); %Add inverter cost to objective function
+Objective = Objective + inv_v*sum(inv_adopt); %Add inverter cost to objective function
 
 %Objective = Objective + sum(inv_adopt);
 
@@ -16,28 +16,30 @@ Pinv_in = sdpvar(T,K,'full'); %kW
 Pinv_out = sdpvar(T,K,'full'); %kW
 Qinv = sdpvar(T,K,'full'); %kVAR 
 Qanc = sdpvar(T,K,'full'); %kVAR
-%Qinv_in = sdpvar(T,K,'full'); %kVAR 
-%Qinv_out = sdpvar(T,K,'full'); %kVAR 
-%Qcap = sdpvar(T,K,'full'); %kVAR
-%Qind = sdpvar(T,K,'full'); %kVAR
+Qinv_in = sdpvar(T,K,'full'); %kVAR 
+Qinv_out = sdpvar(T,K,'full'); %kVAR 
+Qcap = sdpvar(T,K,'full'); %kVAR
+Qind = sdpvar(T,K,'full'); %kVAR
 
-%Objective = Objective + sum(sum(Qind)) + sum(sum(Qcap)); % Adding this with the hopes of reducing Qind anc Qcap
-
-%Objective = Objective + sum(sum(Qimport)); % Adding this with the hopes of reducing Qimport and meeting Qbldg qith Qelec
+%Objective = Objective + sum(sum(Qind)) + sum(sum(Qcap)); % Adding this to reduce Qind and Qcap
+%Objective = Objective + sum(sum(Qimport)); % Adding this to reduce Qimport and meeting Qbldg qith Qelec
 
     Constraints = [Constraints 
         (Pinv == Pinv_in - Pinv_out):'Pinv'
         (Pinv_in == ees_chrg):'Pinv_in'
         (Pinv_out == pv_elec + pv_nem + pv_wholesale + ees_dchrg + rees_dchrg + rees_dchrg_nem):'Pinv_out'
-         Pinv_in >= 0;
-         Pinv_out >= 0; 
+        (Pinv_in >= 0):'Pinv_in >=0'
+        (Pinv_out >= 0):'Pinv_out >=0'
         (Qinv == -Qelec + Qanc ):'Qinv'
-        %(Qinv == Qinv_in - Qinv_out ):'Qinv'
-        %(Qinv_in == Qind  ):'Qinv_in'
-        %(Qinv_out == Qelec + Qcap ):'Qinv_out'
-         %Qinv_in >= 0;
-         %Qinv_out >= 0;
-     ]; 
+        (Qanc == Qind - Qcap):'Qanc = Qind - Qcap'
+        (Qcap >=0):'Qcap >=0'
+        (Qind >=0):'Qind >=0'
+        (Qinv == Qinv_in - Qinv_out ):'Qinv'
+        (Qinv_in == Qind  ):'Qinv_in'
+        (Qinv_out == Qelec + Qcap ):'Qinv_out'
+        (Qinv_in >= 0):'Qinv_in >=0'
+        (Qinv_out >= 0):'Qinv_out >=0'
+     ] 
 
 if invertermode == 1 %Standard inverter 
     % No Pinv curtail at the AC side (Pinv == (...)
@@ -52,7 +54,11 @@ if invertermode == 1 %Standard inverter
     ];
 
         bldg = []
-    
+        
+elseif invertermode == 2 
+  
+        bldg = []  
+        
 elseif invertermode ==3 %Smart-Inverter with droop-control
     
     % Allows Pinv curtail at the AC level (Pinv_out <= (...))

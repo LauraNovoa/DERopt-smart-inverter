@@ -9,7 +9,9 @@ opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
 %% Optimization Parameters
 
 %% Quick Constraints
-force = 1;                 %Force baseline PV adoption 
+force = 0;                 % Force baseline PV adoption 
+bldg_si = 15;              % How many bldgs (worst-case OV ordered) to adopt SI
+vpenalty = 10000;          % Weight for voltage penalty (opt_smart_inverter_4)
 nopv = 0;                  % Turn off all PV
 noees = 1;                 % Turn off all EES/REES
 toolittle_pv = 0;          % min size for PV adoption = 3 kW
@@ -18,14 +20,15 @@ pv_maxarea = 0;            % limit area for PV adoption
 tc = 0;                    % On/Off transformer constraints
 opt_t = 0;                 % On/Off optimize transformer size (T_rated)
 ic = 1;                    % On/Off inverter polygon constraints
-invertermode = 3;          % (1) Standard (2) Optimal PQ, (3) Smart-Inveter with droop-control
+invertermode = 2;          % (1) Standard (2) Optimal PQ, (3) Smart-Inveter with droop-control
+equalqinv = 1;              % share q amongst buildings 
 nem_c = 1;                 % On/Off NEM constraints 
 zne = 1;                   % 1 = 100% ZNE ! (At the building level)
 dlpfc = 1;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
 lindist = 0;               % On/Off LinDistFlow constraints 
 socc = 0;                  % On/Off SOC constraints
-voltage = 0;               % Use upped and lower limit for voltage 
-VL = 0.95;                  % High Voltage Limit(p.u.)
+voltage = 0;               % On/Off Voltage Constraints VL <= V <= VH 
+VL = 0.95;                 % High Voltage Limit(p.u.)
 VH = 1.05;                 % Low Voltage Limit (p.u.)
 branchC = 0;               % On/Off Banch kVA constraints
 primonly = 0;              % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
@@ -64,9 +67,10 @@ mpc = loadcase('caseAEC_XFMR_4')
 N = size(bus,1);  %number of nodes
 B = size(branch,1); %number of branches
 
-Rmulti = 1;      % Multiplier for resistance in impedance matrix
-
+Rmulti = 1.0;      % Multiplier for resistance in impedance matrix
+Xmulti = 1;      % Multiplier for reactance in impedance matrix
 mpc.branch(:,3) = Rmulti.*mpc.branch(:,3);
+mpc.branch(:,4) = Xmulti.*mpc.branch(:,4);
 
 %T_map = [65 76	84	82	78	74	72	84	70	4	12	7	15	10	39	44	19	47	34	67	59	53	61	30	80	22	57	27	63	51	24];%Apr.10.19 %84-node
 T_map = [106	111	115	114	112	110	109	101	108	85	88	86	89	87	96	97	90	98	95	107	103	100	104	94	113	91	102	93	105	99	92];%Jun.17.19 %115-node
@@ -229,6 +233,22 @@ if invertermode == 3
     elapsed = toc;
     fprintf('Took %.2f seconds \n', elapsed)
 end 
+
+%gambiarra to add vpenalty when in PQ mode
+if invertermode ==2 
+        tt = sdpvar(N,T,'full');
+
+        Objective = Objective + vpenalty*sum(sum(tt)); %Gives more weight to the penalty for voltage deviation
+
+        Constraints = [Constraints
+            (tt >= (1-Volts)):'tt >= 1-Volts'
+            (tt >= -(1-Volts)):'tt >= -(1-Volts)'
+            ];
+end
+
+
+opt_equalinv
+
 %% NEM Constraints
 fprintf('%s: NEM Constraints...', datestr(now,'HH:MM:SS'))
 tic
@@ -288,3 +308,9 @@ title(sprintf('Linearized AC Voltage range: %.3f - %.3f p.u.',min(min(Volts)),ma
 xlabel('Node')
 ylabel('Volts (p.u.)')
 
+tt = value(tt);
+sum_tt =sum(sum(tt))
+
+sum(sum(Qdevp)) + sum(sum(Qdevn))
+Q
+sum(inv_adopt)

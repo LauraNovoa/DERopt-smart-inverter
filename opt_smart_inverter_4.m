@@ -30,8 +30,8 @@ mind = (VV_Q4 - VV_Q3)/(VV_V4 - VV_V3);
 % yi = linspace(0,4000,3);
 
 %SI points mesh
-xi = [VV_V1-0.1 VV_V1 VV_V2 VV_V3 VV_V4 VV_V4+0.1]
-yi = linspace(0,2500,2)
+xi = [VV_V1-0.1 VV_V1 VV_V2 VV_V3 VV_V4 VV_V4+0.1];
+yi = linspace(0,2500,2);
 
 [X,Y] = meshgrid (xi,yi); 
 
@@ -60,9 +60,9 @@ yi = linspace(0,2500,2)
 %slackp = sdpvar(T,K,'full');
 %slackn = sdpvar(T,K,'full');
  
-% %% Choose bldgs to have Smart Inverters
-% %Run this after Baseline
-% 
+%% Choose bldgs to have Smart Inverters
+%Run this after Baseline
+
 % %Identifying nodes with worst over-voltage
 % %[val row] = sort(max(Volts'),'descend');
 % [val row] = sort(max(BusVolAC'),'descend');
@@ -78,19 +78,30 @@ yi = linspace(0,2500,2)
 % end 
 % bldg
 % ov
-%% bldg vector
+% 
+% %Identifying nodes with worst under-voltage
+% %[val row] = sort(max(Volts'),'ascend');
+% [val row] = sort(min(BusVolAC'),'ascend');
+% 
+% %Build vector of which bldgs to place si
+% bldg2 = [];
+% uv = [];
+% for i=1:N
+%     bldg2 = [bldg2 find(T_map==row(i))];
+%     if ~isempty(find(T_map==row(i)))
+%       uv = [uv val(i)];
+%     end
+% end 
+% bldg2
+% uv
+%% Where to adopt SI
 
-%bldg = [1 2];
-%bldg = [1 2 10 12 22]
-%bldg = [1 5 6 10 12] %Results are kind of the smae as 5bldg above
-%bldg = [1 2 4 6 10 12 15 17 19 22 23 25 29 30 31];
-%bldg = [1 2 4 12 17 22 25 29 30 31];
-
-%bldg = [11    14     1    17    12    10    16]; %6
-%bldg = [11    14     1    17    12    10    16]; %7
-%bldg = [ 11    14     1    17    12    10    16    13    19     6 ];%10
+%Buildings with worst over-voltage 
 bldg = [11,14,1,17,12,10,16,13,19,6,5,29,18,15,3,28,2,24,8,7,9,27,25,4,20,21,23,31,26,30,22];
-bldg = bldg(1:15);
+bldg = bldg(1:bldg_si)
+
+%Baseline
+%bldg = [];
 
 for k=1:length(bldg) % only add constraints to the buildings listed in 'bldg' vector
    for t=1:T
@@ -105,10 +116,10 @@ for k=1:length(bldg) % only add constraints to the buildings listed in 'bldg' ve
    end
 end
 
-%rest of buildings that do not have smart inverters 
+%Rest of buildings that do not have smart inverters 
 restbldg = (1:1:K); restbldg(bldg) = [];
 
-for k=1:length(restbldg) %make those not output any Qanc and do not cutail
+for k=1:length(restbldg) %make those not output any Qanc and do not curtail PV at the DC level
     Constraints = [Constraints
             (Qanc(:,restbldg(k)) == 0):'Qanc = 0'
             (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'Do not curtail fo std inv'
@@ -128,7 +139,8 @@ end
 
 tt = sdpvar(N,T,'full');
 
-Objective = Objective + sum(sum(tt));
+%Objective = Objective + sum(sum(tt));
+Objective = Objective + vpenalty*sum(sum(tt)); %Gives more weight to the penalty for voltage deviation
 
 Constraints = [Constraints
     (tt >= (1-Volts)):'tt >= 1-Volts'
