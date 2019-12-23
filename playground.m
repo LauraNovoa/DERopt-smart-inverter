@@ -11,7 +11,9 @@ opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
 %% Quick Constraints
 force = 1;                 % Force baseline PV adoption 
 bldg_si = 5;               % How many bldgs (worst-case OV ordered) to adopt SI
-vpenalty = 1000;            % Weight for voltage penalty (opt_smart_inverter_4)
+vpenalty = 800;           % Weight for overvoltage penalty
+vpenaltyover = 1000;        % Weight for overvoltage penalty
+vpenaltyunder = 300;       % Weight for undervoltage penalty 
 nopv = 0;                  % Turn off all PV
 noees = 1;                 % Turn off all EES/REES
 toolittle_pv = 0;          % min size for PV adoption = 3 kW
@@ -236,6 +238,18 @@ end
 
 %gambiarra to add vpenalty when in PQ mode
 if invertermode ==2 
+    
+%     voltsover = sdpvar(N,T,'full');
+%     voltsunder = sdpvar(N,T,'full');
+%     
+%     Constraints = [Constraints
+%         Volts == repmat(1,N,T) + voltsover - voltsunder
+%         voltsover >= 0
+%         voltsunder >=0 
+%         ];
+% 
+%     Objective = Objective + vpenaltyover*sum(sum(voltsover)) + vpenaltyunder*sum(sum(voltsunder));
+%     
         tt = sdpvar(N,T,'full');
 
         Objective = Objective + vpenalty*sum(sum(tt)); %Gives more weight to the penalty for voltage deviation

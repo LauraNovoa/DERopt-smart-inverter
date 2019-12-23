@@ -20,7 +20,7 @@ warning('off','YALMIP:BigM')
 for t=1:T
     for k=1:K
     Constraints = [Constraints 
-        (implies(Qind(t,k) >= 1, Qcap(t,k) == 0)):'QcapQind'
+        (implies(Qind(t,k) >= 1, Qcap(t,k) == 0)):sprintf('Qanc/Qind ON OFF  t=%d, k=%d',t,k)
         ];
     end 
 end 
