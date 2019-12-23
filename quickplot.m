@@ -21,16 +21,21 @@ pallete = bright;
 
     
  k=11; %Choose building #
+ kbldg= [ 11 12 13 14 15 16 17 18 19 20 21 22 24];
+ %kbldg= [11];
  s=1; %spacing for x axis
  tlim1 = 1;
  tlim2 = 24; % Limit for x-axis (for all plots)
 
  legon = 0;
  leglocation = 'best';
- alpha = 1; %08 for ransparent legend 
+ alpha = 0.8; %08 for transparent legend 
  
 %%  Inverter dynamics
-
+for i=1:length(kbldg)
+    
+    k=kbldg(i); %plots for a lot of bldgs
+    
     Position = [ 541   303   607   427];
     fig = figure('Position', Position ,'PaperPositionMode','auto');
     fig.Color = 'w';
@@ -86,6 +91,7 @@ pallete = bright;
     %set(ax,'xticklabel',num2str(tix2,'%.0f'));
     ax.YMinorTick = 'on';
    
+end 
 
 %%  Transformer dynamics
 %     fig = figure('Position', Position ,'PaperPositionMode','auto');

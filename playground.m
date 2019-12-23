@@ -9,9 +9,9 @@ opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
 %% Optimization Parameters
 
 %% Quick Constraints
-force = 0;                 % Force baseline PV adoption 
-bldg_si = 15;              % How many bldgs (worst-case OV ordered) to adopt SI
-vpenalty = 10000;          % Weight for voltage penalty (opt_smart_inverter_4)
+force = 1;                 % Force baseline PV adoption 
+bldg_si = 5;               % How many bldgs (worst-case OV ordered) to adopt SI
+vpenalty = 1000;            % Weight for voltage penalty (opt_smart_inverter_4)
 nopv = 0;                  % Turn off all PV
 noees = 1;                 % Turn off all EES/REES
 toolittle_pv = 0;          % min size for PV adoption = 3 kW
@@ -21,7 +21,7 @@ tc = 0;                    % On/Off transformer constraints
 opt_t = 0;                 % On/Off optimize transformer size (T_rated)
 ic = 1;                    % On/Off inverter polygon constraints
 invertermode = 2;          % (1) Standard (2) Optimal PQ, (3) Smart-Inveter with droop-control
-equalqinv = 1;              % share q amongst buildings 
+equalqinv = 1;             % share q amongst buildings 
 nem_c = 1;                 % On/Off NEM constraints 
 zne = 1;                   % 1 = 100% ZNE ! (At the building level)
 dlpfc = 1;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
@@ -34,7 +34,7 @@ branchC = 0;               % On/Off Banch kVA constraints
 primonly = 0;              % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
 minpf = 0;                 % On/Off Min PF at the transfromer
 VV = 1;                    % On/Off Volt-Var
-VW = 0;                    % On/Off Volt-Watt
+VW = 1;                    % On/Off Volt-Watt
 
 if dlpfc || lindist 
     cnstrts = table(nopv,noees,tc,opt_t,ic,invertermode,nem_c, zne,dlpfc,lindist,voltage, VL,VH, branchC,primonly,toolittle_pv,toolittle_storage,pv_maxarea, minpf,opt_cplex,opt_yalmip,force, 'VariableNames',{'nopv','noees','tc','opt_t','ic','invmode','nem_c','ZNE','dlpf','lindist','V','Vlow','Vhigh','Branch','primonly','MinPV','MinEES','MaxPVarea','minpf','CPLEX','YALMIP','force'})
@@ -197,7 +197,7 @@ fprintf('Took %.2f seconds \n', elapsed)
 %% Inverter Constraints
 fprintf('%s: Inverter Constraints...', datestr(now,'HH:MM:SS'))
 ttime = tic;
-opt_inverter_3 % Opt PQ with Qelec
+opt_inverter_3 
 elapsed = toc(ttime);
 fprintf('Took %.2f seconds \n', elapsed)
 %% Transformer Constraints
@@ -246,7 +246,6 @@ if invertermode ==2
             ];
 end
 
-
 opt_equalinv
 
 %% NEM Constraints
@@ -282,6 +281,8 @@ end
 
 adopt
 
+bar([Qcap(:,11) Qind(:,11)])
+
 quickplot 
 
 % figure
@@ -297,20 +298,18 @@ xlabel('Node')
 ylabel('Volts (p.u.)')
 
 % figure
-% plot(Volts)
+% plot(Volts(:,2:end))
 % title(sprintf('Linearized AC Voltage range: %.3f - %.3f p.u.',min(min(Volts)),max(max(Volts))))
 % xlabel('Node')
 % ylabel('Volts (p.u.)')
 
-figure
-plot(Volts(:,2:end))
-title(sprintf('Linearized AC Voltage range: %.3f - %.3f p.u.',min(min(Volts)),max(max(Volts))))
-xlabel('Node')
-ylabel('Volts (p.u.)')
-
 tt = value(tt);
-sum_tt =sum(sum(tt))
+sum_tt = sum(sum(tt))
 
 sum(sum(Qdevp)) + sum(sum(Qdevn))
 Q
 sum(inv_adopt)
+PVCurtail
+inv_diff = sum(inv_adopt - max(Sinv))
+sprintf('True AC Voltage range: %.3f - %.3f p.u.',min(min(BusVolAC)),max(max(BusVolAC)))
+

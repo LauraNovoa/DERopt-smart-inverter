@@ -83,10 +83,9 @@ Sinv = sqrt(Pinv.^2 + Qinv.^2);%Absolute value  %kVA
 Qanc = value(Qanc); %kVAR
 Qind = value(Qind); %kVAR
 Qcap = value(Qcap); %kVAR
-%Qind = zeros(size(Qanc)); Qind(Qanc>0)= Qanc(Qanc>0);
-%Qcap = zeros(size(Qanc)); Qcap(Qanc<0)= Qanc(Qanc<0);
-%Qind = value(Qind); %kVAR
-%Qcap = value(Qcap); %kVAR
+Pinv_out = value(Pinv_out); %kW
+Pinv_in =  value(Pinv_in); %kW
+Pinv_curtail = value(Pinv_curtail); %kW
 Qelec = value(Qelec); %kVAR
 Qimport = value(Qimport); %kVAR
 %Sinv = Pinv./cos(atan(Qinv./Pinv)); %kVA %Captures the (+) and (-) flows 

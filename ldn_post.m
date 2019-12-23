@@ -8,6 +8,7 @@ totalEES_kW = max(max(sum(ees_chrg,2)),max(sum(ees_dchrg,2)));
 totalEES_kWh = sum(ees_adopt);
 totalREES_kW = max(max(sum(rees_chrg,2)),max(sum(rees_dchrg,2)));
 totalREES_kWh = sum(rees_adopt);
+
 %Import/Export
 %"multi" subscript refers to scaling up the totals to account for all days, not only representative days.
 total_import = sum(sum(import));
@@ -36,14 +37,17 @@ NetEnergy = total_import - total_export;
 
 totalEES_chrg_kWh = sum(sum(ees_chrg));
 totalEES_dchrg_kWh = sum(sum(ees_dchrg));
- 
+
 if nopv == 0
+%DC curtail   
 pv_curtail = ( repmat(solar,1,K).*repmat(pv_adopt,T,1) ) - ( pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg ); 
 PVCurtail = sum(sum(pv_curtail));
 PVCurtail_multi = sum(sum(repmat(day_multi,1,K).*pv_curtail));
+
 else 
-    PVCurtail = 0;PVCurtail_multi =0;
+    PVCurtail = 0; PVCurtail_multi =0;ACCurtail =0;
 end 
+
 
 format shortG
 SystemTotals = table(totalPV_kW,totalEES_kW,totalEES_kWh,totalREES_kW,totalREES_kWh,'VariableNames' , {'Total_PV_kW','Total_EES_kW','Total_EES_kWh','Total_REES_kW','Total_REES_kWh'})

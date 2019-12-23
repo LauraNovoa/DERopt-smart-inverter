@@ -6,15 +6,17 @@
 %% PV Constraints
 if isempty(pv_v) == 0 
       
-%      % NEVER curtail PV at the DC level
-%      Constraints = [Constraints, (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance'];   
+     % NEVER curtail PV at the DC level
+      %Constraints = [Constraints, (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance'];   
 
     if invertermode == 1
         % Do not curtail PV at the DC level
-            Constraints = [Constraints, (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance'];   
+        Constraints = [Constraints, 
+            (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg == repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance (No DC curtail)'];   
     else  
         % For SI, Allow PV curtail at the DC level
-            Constraints = [Constraints, (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance'];
+        Constraints = [Constraints, 
+            (pv_wholesale + pv_elec + ees_chrg_pv + pv_nem + rees_chrg <= repmat(solar,1,K).*repmat(pv_adopt,T,1)):'PV balance (DC Curtail)'];
     end 
 %% Min PV to adopt: 3 kW
 if toolittle_pv ==1 
