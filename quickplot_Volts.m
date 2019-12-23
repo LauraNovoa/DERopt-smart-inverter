@@ -243,10 +243,10 @@ pallete = bright;
     d = 0.01;
     p1 = plot(nodeuv, uv,'o' ,'MarkerSize', 5,'Color','k','MarkerFaceColor',pallete(2,:));
     p2 = plot(nodeov, ov,'o' ,'MarkerSize', 5,'Color','k','MarkerFaceColor',pallete(2,:));
-    text(nodeuv-d, uv+d, sprintf('%.3f',uv),'FontSize', 11)
-    text(nodeov+d, ov+d, sprintf('%.3f',ov),'FontSize', 11)
-    text(nodeuv-d, uv+d, sprintf('%.3f @ node %.0f',uv,nodeuv),'FontSize', 11)
-    text(nodeov+d, ov+d, sprintf('%.3f @ node %.0f',ov,nodeov),'FontSize', 11)
+    text(nodeuv-d, uv+d, sprintf('%.2f',uv),'FontSize', 11)
+    text(nodeov+d, ov+d, sprintf('%.2f',ov),'FontSize', 11)
+    text(nodeuv-d, uv+d, sprintf('%.2f @ node %.0f',uv,nodeuv),'FontSize', 11)
+    text(nodeov+d, ov+d, sprintf('%.2f @ node %.0f',ov,nodeov),'FontSize', 11)
   
     ax.FontSize = 12;
     ax.XTickLabelRotation = 90;
@@ -258,7 +258,7 @@ pallete = bright;
     leg.BoxFace.ColorData = uint8([234 234 242 242*0.8]');
     xlabel('Node');
     ylabel('Voltage Magnitude (p.u.)');
-    ylim([0.88  1.15]) %[0.80 1.085] for all cases but baseline. %Baseline [0.85  1.22]
+    ylim([0.92  1.08]) %[0.80 1.085] for all cases but baseline. %Baseline [0.85  1.22]
     tix=get(ax,'ytick')';
     set(ax,'yticklabel',num2str(tix,'%.3f'))
     ax.YMinorTick = 'on';

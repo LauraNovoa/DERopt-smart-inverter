@@ -12,7 +12,8 @@ if opt_yalmip
     ops = sdpsettings('solver','cplex','debug',1,'verbose',3,'warning',1,'savesolveroutput',1);
     
     ops.showprogress=1;
-    ops.cplex.mip.tolerances.mipgap = 0.004;
+    %ops.cplex.mip.tolerances.mipgap = 0.004;
+    ops.cplex.mip.tolerances.mipgap = 0.04;
     ops.cplex.mip.limits.nodes = 10000;
     ops.cplex.mip.strategy.heuristicfreq = 1;
     %ops.cplex.mip.strategy.probe = 3;

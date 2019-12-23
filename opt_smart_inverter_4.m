@@ -151,7 +151,7 @@ if VW
     VW_V1 = 1.0;
     VW_V2 = 1.03;
     VW_P1 = 1;
-    VW_P2 = 0;
+    VW_P2 = 0.8;
 
 m = (VW_P2 - VW_P1)/(VW_V2 - VW_V1);
               

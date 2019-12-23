@@ -20,9 +20,13 @@ pallete = bright;
     end 
 
     
- k=11; %Choose building #
- kbldg= [ 11 12 13 14 15 16 17 18 19 20 21 22 24];
- %kbldg= [11];
+if invertermode == 3
+    kbldg = bldg;
+else
+    kbldg = [11 12 13 14];
+    %kbldg = [ 11 12 13 14 15 16 17 18 19 20 21 22 24];
+end 
+
  s=1; %spacing for x axis
  tlim1 = 1;
  tlim2 = 24; % Limit for x-axis (for all plots)

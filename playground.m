@@ -10,9 +10,9 @@ opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
 
 %% Quick Constraints
 force = 1;                 % Force baseline PV adoption 
-bldg_si = 5;               % How many bldgs (worst-case OV ordered) to adopt SI
-vpenalty = 800;           % Weight for overvoltage penalty
-vpenaltyover = 1000;        % Weight for overvoltage penalty
+bldg_si = 7;               % How many bldgs (worst-case OV ordered) to adopt SI
+vpenalty = 1;              % Weight for overvoltage penalty
+vpenaltyover = 1000;       % Weight for overvoltage penalty
 vpenaltyunder = 300;       % Weight for undervoltage penalty 
 nopv = 0;                  % Turn off all PV
 noees = 1;                 % Turn off all EES/REES
@@ -29,7 +29,7 @@ zne = 1;                   % 1 = 100% ZNE ! (At the building level)
 dlpfc = 1;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
 lindist = 0;               % On/Off LinDistFlow constraints 
 socc = 0;                  % On/Off SOC constraints
-voltage = 0;               % On/Off Voltage Constraints VL <= V <= VH 
+voltage = 1;               % On/Off Voltage Constraints VL <= V <= VH 
 VL = 0.95;                 % High Voltage Limit(p.u.)
 VH = 1.05;                 % Low Voltage Limit (p.u.)
 branchC = 0;               % On/Off Banch kVA constraints
@@ -69,8 +69,8 @@ mpc = loadcase('caseAEC_XFMR_4')
 N = size(bus,1);  %number of nodes
 B = size(branch,1); %number of branches
 
-Rmulti = 1.0;      % Multiplier for resistance in impedance matrix
-Xmulti = 1;      % Multiplier for reactance in impedance matrix
+Rmulti = 1.2;      % Multiplier for resistance in impedance matrix
+Xmulti = 1.2;      % Multiplier for reactance in impedance matrix
 mpc.branch(:,3) = Rmulti.*mpc.branch(:,3);
 mpc.branch(:,4) = Xmulti.*mpc.branch(:,4);
 
@@ -249,7 +249,7 @@ if invertermode ==2
 %         ];
 % 
 %     Objective = Objective + vpenaltyover*sum(sum(voltsover)) + vpenaltyunder*sum(sum(voltsunder));
-%     
+    
         tt = sdpvar(N,T,'full');
 
         Objective = Objective + vpenalty*sum(sum(tt)); %Gives more weight to the penalty for voltage deviation
