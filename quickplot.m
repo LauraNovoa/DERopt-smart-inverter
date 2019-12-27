@@ -8,6 +8,8 @@ close all
 %% Color Palletes
 load('palletes_ldn');
 pallete = bright;
+%pallete = basic;
+%pallete = colorblind;
 
     n = size(mpc.bus,1);
     m = size(mpc.branch,1);
@@ -23,15 +25,16 @@ pallete = bright;
 if invertermode == 3
     kbldg = bldg;
 else
-    kbldg = [11 12 13 14];
-    %kbldg = [ 11 12 13 14 15 16 17 18 19 20 21 22 24];
+    %kbldg = [11 12 13 14];
+    %kbldg = [ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 ];
+    kbldg = [ 11 10 12 14 ];
 end 
 
  s=1; %spacing for x axis
  tlim1 = 1;
  tlim2 = 24; % Limit for x-axis (for all plots)
 
- legon = 0;
+ legon = 1;
  leglocation = 'best';
  alpha = 0.8; %08 for transparent legend 
  
@@ -50,34 +53,35 @@ for i=1:length(kbldg)
     ax.GridAlpha = 0.9; %set grid white with transparency
     ax.TickLength = [0 0];
     
-    h1 = plot(1:t,Pinv(:,k),'Color',[pallete(2,:) 1],'LineStyle','-','LineWidth',1.5);    
-    h2 = plot(1:t,Qinv(:,k),'Color',[pallete(3,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','d');
-    h3 = plot(1:t,Sinv(:,k),'Color',[pallete(10,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','*');
-    h4 = plot(1:t,Qelec(:,k),'Color',[pallete(4,:) 1],'LineStyle','--','LineWidth',1.5,'Marker','none');
-    %h5 = plot(1:t,Qind(:,k),'Color',[pallete(5,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
-    %h6 = plot(1:t,-Qcap(:,k),'Color',[pallete(1,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
     h5 = bar(1:t,Qind(:,k),'FaceColor',[pallete(5,:)]);
     h6 = bar(1:t,Qcap(:,k),'FaceColor',[pallete(1,:)]);
-    h7 = plot(1:t,Qimport(:,k),'Color',[pallete(9,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','none');
+    h1 = plot(1:t,Pinv(:,k),'Color',[pallete(2,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','o');    
+    h2 = plot(1:t,Qinv(:,k),'Color',[pallete(3,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','d');
+    h3 = plot(1:t,Sinv(:,k),'Color',[pallete(10,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','*');
+    h4 = plot(1:t,Qelec(:,k),'Color',[pallete(7,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','x');
+    h7 = plot(1:t,Qimport(:,k),'Color',[pallete(9,:) 1],'LineStyle','-','LineWidth',1.5,'Marker','+');
     h8 = plot(1:t,-(pv_wholesale(:,k) + pv_elec(:,k) + ees_chrg_pv(:,k) + pv_nem(:,k) + rees_chrg(:,k)),'Color',[pallete(6,:) 1],'LineStyle','-','LineWidth',1.0);
-    h9 = plot(1:t,-(ees_dchrg(:,k) + rees_dchrg(:,k) + rees_dchrg_nem(:,k)),'Color',[pallete(7,:) 1],'LineStyle','-','LineWidth',1.0);
+    h9 = plot(1:t,-(ees_dchrg(:,k) + rees_dchrg(:,k) + rees_dchrg_nem(:,k)),'Color',[basic(1,:) 1],'LineStyle','-','LineWidth',2.0,'Marker','.');
+    h91 = plot(1:t,(rees_chrg(:,k) + ees_chrg_pv(:,k)),'Color',[basic(1,:) 1],'LineStyle','-','LineWidth',2.0,'Marker','.');
     l =  line(1:t,ones(1,t)*inv_adopt(k),'Color',[pallete(8,:) 1],'LineStyle',':','LineWidth',2.0);hold on;
  
-    %[leg, objects ] = legend('Pinv (+)import (-)export','Qinv = -Qelec + Qanc (+) import/ind','Sinv = sqrt(Pinv^2 + Qinv^2)','Qelec','Qanc inv (+) import/ind','Qimport bldg','PV (DC) generation','EES+REES dch (DC)','Inverter kVA','Location',leglocation);
     if legon
-        [leg, objects ] = legend('Pinv (+)import (-)export','Qinv = -Qelec + Qind - Qcap (+) import/ind','Sinv = sqrt(Pinv^2 + Qinv^2)','Qelec','Qind (+)','Qcap (-)','Qimport bldg','PV (DC) generation','EES+REES dch (DC)','Inverter kVA','Location',leglocation);
+        %[leg, objects ] = legend('Pinv (+)import (-)export','Qinv = -Qelec + Qind - Qcap (+) import/ind','Sinv = sqrt(Pinv^2 + Qinv^2)','Qelec','Qind (+)','Qcap (-)','Qimport bldg','PV (DC) generation','EES+REES dch (DC)','Inverter kVA','Location',leglocation);
+        %[leg, objects ] = legend('Pinv','Qinv','Sinv','Qinv_{bldg}','Qind','Qcap','Qimport','PV(DC)','EES+REESdch(DC)','Inverter kVA','Location','southwest');
+        %[leg, objects ]  = legend([h5 h6 h1 h2 h3 h4 h7 h8 l], 'Qind','Qcap','Pinv','Qinv','Sinv','Qinv_{bldg}','Qimport','PV(DC)','Inverter kVA','Location','southwest');
+        [leg, objects ]  = legend([h5 h6 h1 h2 h3 h4 h7 h8 h9 l], 'Qind','Qcap','Pinv','Qinv','Sinv','Qinv_{bldg}','Qimport','PV(DC)','Battery Ch/Dch(DC)','Inverter kVA','Location','southwest');
         leg.BoxFace.ColorType = 'truecoloralpha';
         leg.BoxFace.ColorData = uint8([234 234 242 242*alpha]');
     end
     
     ax.FontSize = 12;
     %ax.XTickLabelRotation = 90;
-    
+       
     %Secondary y axis
     %'Position', ax.Position,
     ax2 = axes('YAxisLocation','Right','Parent',fig,'XTick',1:s:t,'XTickLabel','','Color','none');
-    h10 = line(1:t,BusVolAC(T_map(k),:),'Parent',ax2,'Color',[pallete(8,:) 1],'LineStyle','-','LineWidth',1.2);hold on;
-    
+    h10 = line(1:t,BusVolAC(T_map(k),:),'Parent',ax2,'Color',[pallete(11,:) 1],'LineStyle','-','LineWidth',1.2);hold on;
+    %Prevous voltage color, gray: [pallete(8,:) 1]
     [leg2, objects2 ] = legend('Volts','Location','northeast');
     leg2.BoxFace.ColorType = 'truecoloralpha';
     leg2.BoxFace.ColorData = uint8([234 234 242 242*0.8]');

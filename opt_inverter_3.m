@@ -33,13 +33,22 @@ Qind = sdpvar(T,K,'full'); %kVAR
         (Qinv_in == Qind  ):'Qinv_in'
         (Qinv_out == Qelec + Qcap ):'Qinv_out'
         (Pinv_in >= 0):'Pinv_in >=0'
-        (Pinv_out >= 0):'Pinv_out >=0'
-        (Qcap >=0):'Qcap >=0'
-        (Qind >=0):'Qind >=0'
+        (99999 >= Pinv_out >= 0):'Pinv_out >=0'
+        (99999 >= Qcap >=0):'Qcap >=0'
+        (99999 >= Qind >=0):'Qind >=0'
         (Qinv_in >= 0):'Qinv_in >=0'
         (Qinv_out >= 0):'Qinv_out >=0'
      ]; 
 
+%Only inject/absorb reactive power when there is a positive votlage on the DC link
+for k=1:K
+    for t=1:T
+        Constraints = [Constraints 
+                  (implies(Pinv_out(t,k)<=0.1,[Qind(t,k)==0, Qcap(t,k)==0])):'No reactive power regulation at night'
+                  ];
+    end
+end
+              
 if invertermode == 1 %Standard inverter 
     % No Pinv curtail at the AC side (Pinv_out == (...)
     % No reactive power compensation (Qind, Qcap) nor reactive power to the building(Qelec) , so Qinv =0

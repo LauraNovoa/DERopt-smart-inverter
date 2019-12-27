@@ -252,13 +252,13 @@ pallete = bright;
     ax.XTickLabelRotation = 90;
     
     [leg, objects] = legend([h2(1) h4 h5],'True AC Voltage','Voltage profile at 1 PM','Voltage profile at 6 PM','Location','northwest');
-    title('Voltage profiles - Baseline ');
+    title('Voltage profiles - PQ control ');
     
     leg.BoxFace.ColorType = 'truecoloralpha';
     leg.BoxFace.ColorData = uint8([234 234 242 242*0.8]');
     xlabel('Node');
     ylabel('Voltage Magnitude (p.u.)');
-    ylim([0.92  1.08]) %[0.80 1.085] for all cases but baseline. %Baseline [0.85  1.22]
+    ylim([0.9  1.1]) %[0.80 1.085] for all cases but baseline. %Baseline [0.85  1.22]
     tix=get(ax,'ytick')';
     set(ax,'yticklabel',num2str(tix,'%.3f'))
     ax.YMinorTick = 'on';

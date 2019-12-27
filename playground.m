@@ -30,7 +30,7 @@ dlpfc = 1;                 % On/Off Decoupled Linearized Power Flow (DLPF) const
 lindist = 0;               % On/Off LinDistFlow constraints 
 socc = 0;                  % On/Off SOC constraints
 voltage = 1;               % On/Off Voltage Constraints VL <= V <= VH 
-VL = 0.95;                 % High Voltage Limit(p.u.)
+VL = 0.90;                 % High Voltage Limit(p.u.)
 VH = 1.05;                 % Low Voltage Limit (p.u.)
 branchC = 0;               % On/Off Banch kVA constraints
 primonly = 0;              % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
@@ -317,8 +317,10 @@ ylabel('Volts (p.u.)')
 % xlabel('Node')
 % ylabel('Volts (p.u.)')
 
+if exist('tt','var')
 tt = value(tt);
 sum_tt = sum(sum(tt))
+end 
 
 sum(sum(Qdevp)) + sum(sum(Qdevn))
 Q
