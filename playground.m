@@ -11,7 +11,7 @@ opt_yalmip = 1; %YALMIP,calling CPLEX MILP solver
 %% Quick Constraints
 force = 1;                 % Force baseline PV adoption 
 bldg_si = 7;               % How many bldgs (worst-case OV ordered) to adopt SI
-vpenalty = 1;              % Weight for overvoltage penalty
+vpenalty = 1000;              % Weight for overvoltage penalty
 vpenaltyover = 1000;       % Weight for overvoltage penalty
 vpenaltyunder = 300;       % Weight for undervoltage penalty 
 nopv = 0;                  % Turn off all PV
@@ -22,21 +22,21 @@ pv_maxarea = 0;            % limit area for PV adoption
 tc = 0;                    % On/Off transformer constraints
 opt_t = 0;                 % On/Off optimize transformer size (T_rated)
 ic = 1;                    % On/Off inverter polygon constraints
-invertermode = 2;          % (1) Standard (2) Optimal PQ, (3) Smart-Inveter with droop-control
-equalqinv = 1;             % share q amongst buildings 
+invertermode = 3;          % (1) Standard (2) Optimal PQ, (3) Smart-Inveter with droop-control
+fair = 0;                  % fair share of qind regulation amongst adjacent inverters 
 nem_c = 1;                 % On/Off NEM constraints 
 zne = 1;                   % 1 = 100% ZNE ! (At the building level)
 dlpfc = 1;                 % On/Off Decoupled Linearized Power Flow (DLPF) constraints 
 lindist = 0;               % On/Off LinDistFlow constraints 
 socc = 0;                  % On/Off SOC constraints
-voltage = 1;               % On/Off Voltage Constraints VL <= V <= VH 
-VL = 0.90;                 % High Voltage Limit(p.u.)
+voltage = 0;               % On/Off Voltage Constraints VL <= V <= VH 
+VL = 0.9;                  % High Voltage Limit(p.u.)
 VH = 1.05;                 % Low Voltage Limit (p.u.)
 branchC = 0;               % On/Off Banch kVA constraints
 primonly = 0;              % (1) Banch kVA constraints only on primary nodes. (0) Branch contraints on prim and secondary branches
 minpf = 0;                 % On/Off Min PF at the transfromer
 VV = 1;                    % On/Off Volt-Var
-VW = 1;                    % On/Off Volt-Watt
+VW = 0;                    % On/Off Volt-Watt
 
 if dlpfc || lindist 
     cnstrts = table(nopv,noees,tc,opt_t,ic,invertermode,nem_c, zne,dlpfc,lindist,voltage, VL,VH, branchC,primonly,toolittle_pv,toolittle_storage,pv_maxarea, minpf,opt_cplex,opt_yalmip,force, 'VariableNames',{'nopv','noees','tc','opt_t','ic','invmode','nem_c','ZNE','dlpf','lindist','V','Vlow','Vhigh','Branch','primonly','MinPV','MinEES','MaxPVarea','minpf','CPLEX','YALMIP','force'})
@@ -281,7 +281,7 @@ yalmip_value
 
 %% Post-processing and plots
 ldn_post
-ldn_plots
+%ldn_plots
 
 check_constraints = min(check(Constraints));
 [primal, dual ] = check(Constraints);
@@ -307,7 +307,7 @@ quickplot
 
 figure
 plot(BusVolAC(:,2:end))
-title(sprintf('True AC Voltage range: %.3f - %.3f p.u.',min(min(BusVolAC)),max(max(BusVolAC))))
+title(sprintf('True AC Voltage range: %.3f - %.3f p.u.',min(min(BusVolAC(:,2:end))),max(max(BusVolAC(:,2:end)))))
 xlabel('Node')
 ylabel('Volts (p.u.)')
 
@@ -323,6 +323,7 @@ sum_tt = sum(sum(tt))
 end 
 
 sum(sum(Qdevp)) + sum(sum(Qdevn))
+sum(sum(A.*Qdevp)) + sum(sum(A.*Qdevn))
 Q
 sum(inv_adopt)
 PVCurtail

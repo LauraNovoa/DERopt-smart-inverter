@@ -5,10 +5,12 @@ if VV
     VV_V2 = 0.97;
     VV_V3 = 1.03;
     VV_V4 = 1.1;
-    VV_Q1 = 0.44;
+    %VV_Q1 = 0.44;
+    VV_Q1 = 0.7;
     VV_Q2 = 0;
     VV_Q3 = 0;
-    VV_Q4 = -0.44;
+    %VV_Q4 = -0.44;
+    VV_Q4 = -0.7;
 
 mcap = (VV_Q2 - VV_Q1)/(VV_V2 - VV_V1);
 mind = (VV_Q4 - VV_Q3)/(VV_V4 - VV_V3);

@@ -1,4 +1,4 @@
-close all 
+%close all 
 %% Color Palletes
 load('palletes_ldn');
 pallete = bright;
@@ -12,8 +12,12 @@ pallete = bright;
     else n > 54
         s = 3;
     end 
-
+%% Select plots
+dlpfvsac = 0;      %Compare DLPF Linearized vs. True AC votlages
+dlpfvoltages = 0;  %Lineraized voltages
+truevoltages = 1;  %True AC voltages
 %%  %Voltage Profile for all timesteps - DLPF vs. ACPF
+if dlpfvsac
     Position = [467   -53   812   515];
     fig = figure('Position', Position ,'PaperPositionMode','auto');
     fig.Color = 'w';
@@ -119,11 +123,13 @@ pallete = bright;
     set(ax,'yticklabel',num2str(tix,'%.3f'))
     ax.YMinorTick = 'on';
     xlim([1 N])
+end
 
 %% No comparison
 
 %%  Voltage Profile for all timesteps - only for DLPF
-    Position = [  532    20   596   432];
+if dlpfvoltages
+Position = [  532    20   596   432];
     fig = figure('Position', Position ,'PaperPositionMode','auto');
     fig.Color = 'w';
     ax = axes('Parent',fig,'XTick',1:s:n);
@@ -211,9 +217,10 @@ pallete = bright;
     set(ax,'yticklabel',num2str(tix,'%.3f'))
     ax.YMinorTick = 'on';
     xlim([1 N])
-    
+end    
     
     %%  Voltage Profile for all timesteps - only True
+if truevoltages 
     Position = [  532    20   596   432];
     fig = figure('Position', Position ,'PaperPositionMode','auto');
     fig.Color = 'w';
@@ -232,8 +239,8 @@ pallete = bright;
     %Highlight a specific timestep 
     %1 PM
     h4 = plot(1:n,BusVolAC(:,13),':k','LineWidth',1.6);hold on;
-    %6 PM
-    h5 = plot(1:n,BusVolAC(:,18),'-.k','LineWidth',1.3);hold on;
+    %8 PM
+    h5 = plot(1:n,BusVolAC(:,20),'-.k','LineWidth',1.3);hold on;
 
     %Highlight, for thefirst day of each month @ 13 PM and 6 PM (check)
     %  h4 = plot(1:n,Volts(:,endpts-11),'Color','k','LineWidth',0.6);hold on;
@@ -251,8 +258,8 @@ pallete = bright;
     ax.FontSize = 12;
     ax.XTickLabelRotation = 90;
     
-    [leg, objects] = legend([h2(1) h4 h5],'True AC Voltage','Voltage profile at 1 PM','Voltage profile at 6 PM','Location','northwest');
-    title('Voltage profiles - PQ control ');
+    [leg, objects] = legend([h2(1) h4 h5],'True AC Voltage','Voltage profile at 1 PM','Voltage profile at 8 PM','Location','northwest');
+    title('Voltage profiles - Baseline ');
     
     leg.BoxFace.ColorType = 'truecoloralpha';
     leg.BoxFace.ColorData = uint8([234 234 242 242*0.8]');
@@ -263,3 +270,4 @@ pallete = bright;
     set(ax,'yticklabel',num2str(tix,'%.3f'))
     ax.YMinorTick = 'on';
     xlim([1 N])
+end 

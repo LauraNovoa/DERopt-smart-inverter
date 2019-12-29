@@ -44,7 +44,7 @@ Qind = sdpvar(T,K,'full'); %kVAR
 for k=1:K
     for t=1:T
         Constraints = [Constraints 
-                  (implies(Pinv_out(t,k)<=0.1,[Qind(t,k)==0, Qcap(t,k)==0])):'No reactive power regulation at night'
+                  (implies(Pinv_out(t,k)<=0.1,[Qind(t,k)==0, Qcap(t,k)==0 , Qelec(t,k)==0])):'No reactive power regulation at night'
                   ];
     end
 end

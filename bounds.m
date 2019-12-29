@@ -6,7 +6,7 @@
             (0 <= midpeak_dc):'0  midpeak_dc'
             (0 <= import):'0 import'
             (0 <= inv_adopt<= 5000):'0 <= inv_adop <= 5000'
-            (0 <= Qelec):'0 <= Qelec'
+            (0 <= Qelec <= 99999):'0 <= Qelec'
             (0 <= Qimport):'0 <= Qimport'
             (-99999 <= Qanc <= 99999):'-99999 <= Qanc <= 99999'
             (0 <= Qind <= 999999):'0 <= Qind <= 999999'

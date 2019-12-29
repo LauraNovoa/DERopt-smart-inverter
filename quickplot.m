@@ -27,7 +27,7 @@ if invertermode == 3
 else
     %kbldg = [11 12 13 14];
     %kbldg = [ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 ];
-    kbldg = [ 11 10 12 14 ];
+    kbldg = [ 11 10 12 14 ];  
 end 
 
  s=1; %spacing for x axis
@@ -86,7 +86,9 @@ for i=1:length(kbldg)
     leg2.BoxFace.ColorType = 'truecoloralpha';
     leg2.BoxFace.ColorData = uint8([234 234 242 242*0.8]');
 
-    title(sprintf('Inverter Dynamics | %.0f kVA | XFMR: %.0f kVA | Bldg:%.0f',inv_adopt(k),T_rated(T_map(k)),k))
+   % title(sprintf('Inverter Dynamics | %.0f kVA | XFMR: %.0f kVA | Bldg:%.0f',inv_adopt(k),T_rated(T_map(k)),k))
+    title(sprintf('Building %.0f - Inverter Dynamics ( %.0f kVA ) ',k,inv_adopt(k)))
+
     ax.YLabel.String='kW/kVar';
     ax2.YLabel.String ='Volts';
     ax.XLabel.String = 'Hour';
